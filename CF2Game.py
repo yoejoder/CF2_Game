@@ -19,7 +19,9 @@ foodCounter = 0
 NEWFOOD = 40
 FOODSIZE = 20
 
-player = pygame.Rect(300,700,50,50)
+player = pygame.Rect(300,100,50,50)
+playerImage = pygame.image.load('player.png')
+playerStretchedImage = pygame.transform.scale(playerImage, (40,40))
 foods = []
 for i in range(numberFood):
     foods.append(pygame.Rect(random.randint(0,WINDOWWIDTH - FOODSIZE),random.randint(0,WINDOWHEIGHT - FOODSIZE), FOODSIZE, FOODSIZE))
@@ -92,9 +94,6 @@ while True:
     if moveRight and player.right < WINDOWWIDTH:
         player.right += MOVESPEED
 
-    # Draw the player
-    pygame.draw.rect(windowSurface, BLACK, player)
-
     # Draw the food
     # for i in range(len(foods)):
     #     pygame.draw.rect(windowSurface, GREEN, foods[i])
@@ -105,6 +104,8 @@ while True:
             foods.remove(food)
             score += 1
         pygame.draw.rect(windowSurface, GREEN, food)
+
+    windowSurface.blit(playerStretchedImage,player)
 
     # Draw the window on the screen
     pygame.display.update()
