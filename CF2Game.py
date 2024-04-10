@@ -19,7 +19,7 @@ foodCounter = 0
 NEWFOOD = 40
 FOODSIZE = 20
 
-player = pygame.Rect(300,100,50,50)
+player = pygame.Rect(300,700,50,50)
 playerImage = pygame.image.load('player.png')
 playerStretchedImage = pygame.transform.scale(playerImage, (40,40))
 foods = []
