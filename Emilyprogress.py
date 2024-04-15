@@ -12,11 +12,11 @@ pygame.display.set_caption("Collision Game")
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
-numberFood = 20
+numberFood = 10
 
 foodCounter = 0
-NEWFOOD = 300
-FOODSIZE = 40
+NEWFOOD = 400
+FOODSIZE = 50
 
 player = pygame.Rect(300, 700, 50, 50)
 playerImage = pygame.image.load('spaceship.png')
@@ -35,7 +35,7 @@ moveRight = False
 # moveDown = False
 
 MOVESPEED = 1
-lives = 3
+lives = 5
 
 font = pygame.font.SysFont(None, 36)
 
@@ -96,7 +96,7 @@ while True:
     if moveRight and player.right < WINDOWWIDTH:
         player.right += MOVESPEED
 
-    # Draw the food
+    # draw the food
     for food in foods[:]:
         if player.colliderect(food):
             foods.remove(food)
