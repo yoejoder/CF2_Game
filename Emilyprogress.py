@@ -35,7 +35,6 @@ moveRight = False
 # moveDown = False
 
 MOVESPEED = 1
-score = 0
 lives = 3
 
 font = pygame.font.SysFont(None, 36)
@@ -101,21 +100,12 @@ while True:
     for food in foods[:]:
         if player.colliderect(food):
             foods.remove(food)
-            score -= 1
+            lives -= 1
         windowSurface.blit(pygame.transform.scale(cometImage, (FOODSIZE, FOODSIZE-10)), food)
 
     windowSurface.blit(playerStretchedImage, player)
 
     lives_text = font.render("Lives: " + str(lives), True, WHITE)
     windowSurface.blit(lives_text, (10, 10))
-
-    # collision detection
-    for food in foods:
-        if player.colliderect(food):
-            foods.remove(food)
-            lives -= 1
-            if lives == 0:
-                lives = 3
-                score = 0
 
     pygame.display.update()
