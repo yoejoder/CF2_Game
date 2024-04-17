@@ -8,37 +8,38 @@ from pygame.locals import *
 pygame.init()
 mainClock = pygame.time.Clock()
 
-WINDOWWIDTH = 800
-WINDOWHEIGHT = 750
-windowSurface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT), 0, 32)
+screen_width = 800
+screen_height = 750
+screen = pygame.display.set_mode((screen_width, screen_height), 0, 32)
 pygame.display.set_caption("Collision Game")
 
 background = pygame.image.load('space.jpg')
-background = pygame.transform.scale(background, (WINDOWWIDTH + 50, WINDOWHEIGHT))
+background = pygame.transform.scale(background, (screen_width + 50, screen_height))
+background_height = background.get_height()
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
+y1 = 0
+y2 = background_height
 
 numberFood = 4
 foodCounter = 0
 NEWFOOD = 500
 FOODSIZE = 90
 
-player = pygame.Rect(WINDOWWIDTH/2, WINDOWHEIGHT - 100, 50, 50)
+player = pygame.Rect(screen_width/2, screen_height - 100, 50, 50)
 playerImage = pygame.image.load('spaceship.png')
 playerStretchedImage = pygame.transform.scale(playerImage, (60, 60))
 cometImage = pygame.image.load('comet.png')
 
 foods = []
 for i in range(numberFood):
-    foods.append(pygame.Rect(random.randint(0, WINDOWWIDTH - FOODSIZE), random.randint(0, WINDOWHEIGHT - FOODSIZE),
+    foods.append(pygame.Rect(random.randint(0, screen_width - FOODSIZE), random.randint(0, screen_height - FOODSIZE),
                              FOODSIZE, FOODSIZE))
 
 # Movement Variables
 moveLeft = False
 moveRight = False
-# moveUp = False
-# moveDown = False
 
 MOVESPEED = 1
 lives = 5
@@ -59,27 +60,17 @@ while True:
             if event.key == K_RIGHT or event.key == K_d:
                 moveRight = True
                 moveLeft = False
-            # if event.key == K_UP or event.key == K_w:
-            #     moveDown = False
-            #     moveUp = True
-            # if event.key == K_DOWN or event.key == K_s:
-            #     moveDown = True
-            #     moveUp = False
         if event.type == KEYUP:
             if event.key == K_LEFT or event.key == K_a:
                 moveLeft = False
             if event.key == K_RIGHT or event.key == K_d:
                 moveRight = False
-            # if event.key == K_UP or event.key == K_w:
-            #     moveUp = False
-            # if event.key == K_DOWN or event.key == K_s:
-            #     moveDown = False
             if event.key == K_ESCAPE:
                 pygame.quit()
                 sys.exit()
             if event.key == K_x:
-                player.top = random.randint(0,WINDOWHEIGHT - player.height)
-                player.left = random.randint(0, WINDOWWIDTH - player.width)
+                player.top = random.randint(0,screen_height - player.height)
+                player.left = random.randint(0, screen_width - player.width)
 
         if event.type == MOUSEBUTTONUP:
             foods.append(pygame.Rect(event.pos[0], event.pos[1], FOODSIZE, FOODSIZE))
@@ -87,19 +78,29 @@ while True:
     foodCounter += 1
     if foodCounter >= NEWFOOD:
         foodCounter = 0
-        foods.append(pygame.Rect(random.randint(0, WINDOWWIDTH - FOODSIZE), random.randint(0, WINDOWHEIGHT - FOODSIZE),
+        foods.append(pygame.Rect(random.randint(0, screen_width - FOODSIZE), random.randint(0, screen_height - FOODSIZE),
                                  FOODSIZE, FOODSIZE))
 
-    windowSurface.blit(background, (0, 0))
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+    y1 += 2 
+    y2 += 2
+
+    if y1 >= background_height:
+        y1 = -background_height
+    if y2 >= background_height:
+        y2 = -background_height
+
+    screen.blit(background, (0, y1))
+    screen.blit(background, (0, y2))
 
     # Move the player
-    # if moveDown and player.bottom < WINDOWHEIGHT:
-    #     player.top += MOVESPEED
-    # if moveUp and player.top > 0:
-    #     player.top -= MOVESPEED
     if moveLeft and player.left > 0:
         player.left -= MOVESPEED
-    if moveRight and player.right < WINDOWWIDTH:
+    if moveRight and player.right < screen_width:
         player.right += MOVESPEED
 
     # draw the food
@@ -107,11 +108,11 @@ while True:
         if player.colliderect(food):
             foods.remove(food)
             lives -= 1
-        windowSurface.blit(pygame.transform.scale(cometImage, (FOODSIZE, FOODSIZE-10)), food)
+        screen.blit(pygame.transform.scale(cometImage, (FOODSIZE, FOODSIZE-10)), food)
 
-    windowSurface.blit(playerStretchedImage, player)
+    screen.blit(playerStretchedImage, player)
 
     lives_text = font.render("Lives: " + str(lives), True, WHITE)
-    windowSurface.blit(lives_text, (10, 10))
+    screen.blit(lives_text, (10, 10))
 
     pygame.display.update()
