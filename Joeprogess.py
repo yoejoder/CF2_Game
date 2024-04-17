@@ -1,111 +1,42 @@
-import pygame, sys, random
-from pygame.locals import *
+import pygame
+import sys
 
 pygame.init()
-mainClock = pygame.time.Clock()
 
-WINDOWWIDTH = 800
-WINDOWHEIGHT = 800
-windowSurface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT), 0, 32)
-pygame.display.set_caption("Collision Game")
+screen_width = 800
+screen_height = 750
+screen = pygame.display.set_mode((screen_width, screen_height))
 
-BLACK = (0,0,0)
-GREEN = (0,255,0)
-WHITE = (255,255,255)
+background = pygame.image.load('space.jpg')
+background = pygame.transform.scale(background, (screen_width, screen_height * 2))
+background_height = background.get_height()
 
-numberFood = 20
+y1 = 0
+y2 = background_height
 
-foodCounter = 0
-NEWFOOD = 40
-FOODSIZE = 20
-
-player = pygame.Rect(300,700,50,50)
-playerImage = pygame.image.load('player.png')
-playerStretchedImage = pygame.transform.scale(playerImage, (40,40))
-foods = []
-for i in range(numberFood):
-    foods.append(pygame.Rect(random.randint(0,WINDOWWIDTH - FOODSIZE),random.randint(0,WINDOWHEIGHT - FOODSIZE), FOODSIZE, FOODSIZE))
-
-# Movement Variables
-moveLeft = False
-moveRight = False
-# moveUp = False
-# moveDown = False
-
-MOVESPEED = 10
-
-score = 0
-
-# Running the game loop
-while True:
-    # Checking for events
+running = True
+while running:
     for event in pygame.event.get():
-        if event.type == QUIT:
+        if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
-        if event.type == KEYDOWN:
-            if event.key == K_LEFT or event.key == K_a:
-                moveRight = False
-                moveLeft = True
-            if event.key == K_RIGHT or event.key == K_d:
-                moveRight = True
-                moveLeft = False
-            # if event.key == K_UP or event.key == K_w:
-            #     moveDown = False
-            #     moveUp = True
-            # if event.key == K_DOWN or event.key == K_s:
-            #     moveDown = True
-            #     moveUp = False
-        if event.type == KEYUP:
-            if event.key == K_LEFT or event.key == K_a:
-                moveLeft = False
-            if event.key == K_RIGHT or event.key == K_d:
-                moveRight = False
-            # if event.key == K_UP or event.key == K_w:
-            #     moveUp = False
-            # if event.key == K_DOWN or event.key == K_s:
-            #     moveDown = False
-            if event.key == K_ESCAPE:
-                pygame.quit()
-                sys.exit()
-            if event.key == K_x:
-                player.top = random.randint(0,WINDOWHEIGHT - player.height)
-                player.left = random.randint(0, WINDOWWIDTH - player.width)
 
-        if event.type == MOUSEBUTTONUP:
-            foods.append(pygame.Rect(event.pos[0], event.pos[1], FOODSIZE, FOODSIZE))
+    y1 += 2 
+    y2 += 2
 
-    foodCounter += 1
-    if foodCounter >= NEWFOOD:
-        # Add new food
-        foodCounter = 0
-        foods.append(pygame.Rect(random.randint(0,WINDOWWIDTH - FOODSIZE), random.randint(0,WINDOWHEIGHT - FOODSIZE), FOODSIZE, FOODSIZE))
+    if y1 >= background_height:
+        y1 = -background_height
+    if y2 >= background_height:
+        y2 = -background_height
 
-    # Draw white background
-    windowSurface.fill(WHITE)
+    screen.blit(background, (0, y1))
+    screen.blit(background, (0, y2))
 
-    # Move the player
-    # if moveDown and player.bottom < WINDOWHEIGHT:
-    #     player.top += MOVESPEED
-    # if moveUp and player.top > 0:
-    #     player.top -= MOVESPEED
-    if moveLeft and player.left > 0:
-        player.left -= MOVESPEED
-    if moveRight and player.right < WINDOWWIDTH:
-        player.right += MOVESPEED
+    pygame.display.flip()
+    pygame.time.Clock().tick(60)
 
-    # Draw the food
-    # for i in range(len(foods)):
-    #     pygame.draw.rect(windowSurface, GREEN, foods[i])
 
-    # Draw the food
-    for food in foods[:]:
-        if player.colliderect(food):
-            foods.remove(food)
-            score += 1
-        pygame.draw.rect(windowSurface, GREEN, food)
+# space image source: https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.pexels.com%2Fsearch%2Fspace%2520background%2F&psig=AOvVaw3J25w2RRPNARpyiLT2cJOu&ust=1713304119399000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCPDPh62ZxYUDFQAAAAAdAAAAABAE
+# spaceship image source: https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.istockphoto.com%2Fillustrations%2Fspaceship&psig=AOvVaw2vckoaUA3y9-mDd2MJoRlV&ust=1713304202156000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCOi2tNSZxYUDFQAAAAAdAAAAABAE
 
-    windowSurface.blit(playerStretchedImage,player)
 
-    # Draw the window on the screen
-    pygame.display.update()
