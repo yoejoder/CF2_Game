@@ -1,3 +1,7 @@
+# space image source: https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.pexels.com%2Fsearch%2Fspace%2520background%2F&psig=AOvVaw3J25w2RRPNARpyiLT2cJOu&ust=1713304119399000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCPDPh62ZxYUDFQAAAAAdAAAAABAE
+# spaceship image source: https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.istockphoto.com%2Fillustrations%2Fspaceship&psig=AOvVaw2vckoaUA3y9-mDd2MJoRlV&ust=1713304202156000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCOi2tNSZxYUDFQAAAAAdAAAAABAE
+#
+
 import pygame, sys, random
 from pygame.locals import *
 
@@ -9,16 +13,18 @@ WINDOWHEIGHT = 800
 windowSurface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT), 0, 32)
 pygame.display.set_caption("Collision Game")
 
+background = pygame.image.load('space.jpg')
+background = pygame.transform.scale(background, (WINDOWWIDTH + 50, WINDOWHEIGHT))
+
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
 numberFood = 10
-
 foodCounter = 0
 NEWFOOD = 400
 FOODSIZE = 50
 
-player = pygame.Rect(300, 700, 50, 50)
+player = pygame.Rect(WINDOWWIDTH/2, WINDOWHEIGHT - 100, 50, 50)
 playerImage = pygame.image.load('spaceship.png')
 playerStretchedImage = pygame.transform.scale(playerImage, (40, 40))
 cometImage = pygame.image.load('comet.png')
@@ -84,7 +90,7 @@ while True:
         foods.append(pygame.Rect(random.randint(0, WINDOWWIDTH - FOODSIZE), random.randint(0, WINDOWHEIGHT - FOODSIZE),
                                  FOODSIZE, FOODSIZE))
 
-    windowSurface.fill(BLACK)
+    windowSurface.blit(background, (0, 0))
 
     # Move the player
     # if moveDown and player.bottom < WINDOWHEIGHT:
