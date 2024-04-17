@@ -9,7 +9,7 @@ pygame.init()
 mainClock = pygame.time.Clock()
 
 WINDOWWIDTH = 800
-WINDOWHEIGHT = 800
+WINDOWHEIGHT = 750
 windowSurface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT), 0, 32)
 pygame.display.set_caption("Collision Game")
 
@@ -19,14 +19,14 @@ background = pygame.transform.scale(background, (WINDOWWIDTH + 50, WINDOWHEIGHT)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
-numberFood = 10
+numberFood = 4
 foodCounter = 0
-NEWFOOD = 400
-FOODSIZE = 50
+NEWFOOD = 500
+FOODSIZE = 90
 
 player = pygame.Rect(WINDOWWIDTH/2, WINDOWHEIGHT - 100, 50, 50)
 playerImage = pygame.image.load('spaceship.png')
-playerStretchedImage = pygame.transform.scale(playerImage, (40, 40))
+playerStretchedImage = pygame.transform.scale(playerImage, (60, 60))
 cometImage = pygame.image.load('comet.png')
 
 foods = []
