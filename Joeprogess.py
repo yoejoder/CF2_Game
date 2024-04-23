@@ -1,165 +1,172 @@
-# import pygame
-# import sys
+'''
+SOURCES:
+space image source: https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.pexels.com%2Fsearch%2Fspace%2520background%2F&psig=AOvVaw3J25w2RRPNARpyiLT2cJOu&ust=1713304119399000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCPDPh62ZxYUDFQAAAAAdAAAAABAE
+galaxy image source: https://www.peakpx.com/en/hd-wallpaper-desktop-awntk 
+spaceship image source: https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.istockphoto.com%2Fillustrations%2Fspaceship&psig=AOvVaw2vckoaUA3y9-mDd2MJoRlV&ust=1713304202156000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCOi2tNSZxYUDFQAAAAAdAAAAABAE
+comet image link: https://www.google.com/url?sa=i&url=https%3A%2F%2Fm.youtube.com%2Fwatch%3Fv%3DmbZfhJeNx7c&psig=AOvVaw2X7D_DW_XsBBgWmRc-EYCy&ust=1713461913505000&source=images&cd=vfe&opi=89978449&ved=0CBAQjRxqFwoTCPj_nJflyYUDFQAAAAAdAAAAABAE
+background music link: https://www.youtube.com/watch?v=fnOv8MvTukQ
+arduino + python help: https://projecthub.arduino.cc/ansh2919/serial-communication-between-python-and-arduino-663756
 
-# pygame.init()
+'''
+import pygame, sys, random, math, serial
+from pygame.locals import *
 
-# screen_width = 800
-# screen_height = 750
-# screen = pygame.display.set_mode((screen_width, screen_height))
+WIDTH = 800
+HEIGHT = 800
+FPS = 60
+LIVES = 5
 
-# background = pygame.image.load('space.jpg')
-# background = pygame.transform.scale(background, (screen_width, screen_height * 2))
-# background_height = background.get_height()
-
-# y1 = 0
-# y2 = background_height
-
-# running = True
-# while running:
-#     for event in pygame.event.get():
-#         if event.type == pygame.QUIT:
-#             pygame.quit()
-#             sys.exit()
-
-#     y1 += 2 
-#     y2 += 2
-
-#     if y1 >= background_height:
-#         y1 = -background_height
-#     if y2 >= background_height:
-#         y2 = -background_height
-
-#     screen.blit(background, (0, y1))
-#     screen.blit(background, (0, y2))
-
-#     pygame.display.flip()
-#     pygame.time.Clock().tick(60)
-
-
-# # space image source: https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.pexels.com%2Fsearch%2Fspace%2520background%2F&psig=AOvVaw3J25w2RRPNARpyiLT2cJOu&ust=1713304119399000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCPDPh62ZxYUDFQAAAAAdAAAAABAE
-# # spaceship image source: https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.istockphoto.com%2Fillustrations%2Fspaceship&psig=AOvVaw2vckoaUA3y9-mDd2MJoRlV&ust=1713304202156000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCOi2tNSZxYUDFQAAAAAdAAAAABAE
-
-
-import pygame
-import random
-import sys
-
-# Initialize Pygame
-pygame.init()
-
-# Screen dimensions
-SCREEN_WIDTH, SCREEN_HEIGHT = 400, 600
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("Flappy Bird with Shapes")
-
-# Colors
+# define colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-GREEN = (0, 255, 0)
 RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
 
-# Game variables
-bird_x = 50
-bird_y = 300
-bird_width = 30
-bird_height = 30
-bird_y_change = 0
+arduino = serial.Serial()
 
-gravity = 0.5
-jump_height = -10
-ground_height = SCREEN_HEIGHT - 70
-score = 0
+arduino.baudrate = 9600
+arduino.port = '/dev/cu.usbserial-110'
+arduino.open()
+packet = arduino.readline().decode('utf-8').strip()
 
-# Obstacle variables
-obstacle_width = 70
-obstacle_height = random.randint(150, 400)
-obstacle_color = GREEN
-obstacle_speed = 2
-obstacle_gap = 200
-obstacle_list = []
-obstacle_frequency = 1500  # milliseconds
-last_obstacle = pygame.time.get_ticks()
 
-# Font for score
-font = pygame.font.Font(None, 36)
+# initialize pygame and create window
+pygame.init()
+pygame.mixer.init()
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("SpaceFlee")
+clock = pygame.time.Clock()
 
-def draw_bird(bird_y):
-    pygame.draw.rect(screen, RED, (bird_x, bird_y, bird_width, bird_height))
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.transform.scale(player_image, (30,55))
+        self.image.set_colorkey(WHITE)
+        self.rect = self.image.get_rect()
+        self.rect.centerx = WIDTH / 2
+        self.rect.bottom = HEIGHT - 10
+        self.speedx = 0
 
-def draw_obstacles(obstacles):
-    for obstacle in obstacles:
-        pygame.draw.rect(screen, obstacle_color, obstacle[0])
-        pygame.draw.rect(screen, obstacle_color, obstacle[1])
+def update(self):
+    if arduino.in_waiting:
+        if packet == "LEFT":
+            self.speedx = -5
+        elif packet == "RIGHT":
+            self.speedx = 5
+        elif packet == "FORWARD":
+            self.speedx = 0
+        else:
+            print("Unrecognized command") 
 
-def create_obstacle():
-    obstacle_height = random.randint(200, 400)
-    bottom_obstacle = pygame.Rect(SCREEN_WIDTH, ground_height - obstacle_height, obstacle_width, obstacle_height)
-    top_obstacle = pygame.Rect(SCREEN_WIDTH, 0, obstacle_width, ground_height - obstacle_height - obstacle_gap)
-    return (bottom_obstacle, top_obstacle)
+    self.rect.x += self.speedx
+    if self.rect.right > WIDTH:
+        self.rect.right = WIDTH
+    if self.rect.left < 0:
+        self.rect.left = 0
 
-def move_obstacles(obstacles):
-    for obstacle in obstacles:
-        obstacle[0].x -= obstacle_speed
-        obstacle[1].x -= obstacle_speed
-    obstacles = [obstacle for obstacle in obstacles if obstacle[0].x > -obstacle_width]
-    return obstacles
 
-def check_collision(obstacles):
-    for obstacle in obstacles:
-        if bird_rect.colliderect(obstacle[0]) or bird_rect.colliderect(obstacle[1]):
-            return True
-    return False
+    # def powerup(self):
+        # power = Power(self.rect.centerx, self.rect.top)
+
+
+class Mob(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.transform.scale(comet_image, (25,55))
+        self.image.set_colorkey(WHITE)
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randrange(0, WIDTH - self.rect.width)
+        self.rect.y = random.randrange(-100,-40)
+        self.speedy = random.randrange(1,8)
+        self.speedx = random.randrange(-3,3)
+    
+    def update(self):
+        self.rect.x += self.speedx
+        self.rect.y += self.speedy
+        if self.rect.top > HEIGHT + 10 or self.rect.left < -25 or self.rect.right > WIDTH + 20:
+            self.rect.x = random.randrange(0, WIDTH - self.rect.width)
+            self.rect.y = random.randrange(-100,-40)
+            self.speedy = random.randrange(1,8)
+
+
+# load all game graphics
+background = pygame.image.load('galaxy.jpg')
+background = pygame.transform.scale(background, (WIDTH + 50, HEIGHT))
+background_height = background.get_height()
+player_image = pygame.image.load('spaceship_up.png').convert()
+comet_image = pygame.image.load('comet_up.png').convert()
+
+y1 = 0
+y2 = background_height
+
+all_sprites = pygame.sprite.Group()
+mobs = pygame.sprite.Group()
+player = Player()
+all_sprites.add(player)
+for i in range(8):
+    m = Mob()
+    all_sprites.add(m)
+    mobs.add(m)
+
+pygame.mixer.music.load('the-moon.wav')
+pygame.mixer.music.play(-1, 0.0)
+musicPlaying = True
+
+font = pygame.font.SysFont(None, 36)
 
 # Game loop
 running = True
 while running:
-    screen.fill(WHITE)
-    
-    # Event handling
+    # keep loop running at the right speed
+    clock.tick(FPS)
+    # Process input (events)
     for event in pygame.event.get():
+        # check for closing window
         if event.type == pygame.QUIT:
             running = False
-        if event.type == pygame.KEYDOWN:
+        elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                bird_y_change = jump_height
+                player.powerup()
 
-    # Bird movement
-    bird_y_change += gravity
-    bird_y += bird_y_change
-    bird_rect = pygame.Rect(bird_x, bird_y, bird_width, bird_height)
+    # Update
+    all_sprites.update()
 
-    # Ground collision
-    if bird_y + bird_height > ground_height:
-        bird_y = ground_height - bird_height
-        bird_y_change = 0
 
-    # Create new obstacles
-    time_now = pygame.time.get_ticks()
-    if time_now - last_obstacle > obstacle_frequency:
-        obstacle_list.append(create_obstacle())
-        last_obstacle = time_now
 
-    # Draw bird
-    draw_bird(bird_y)
+    # check to see if a comet hit the player
+    hits = pygame.sprite.spritecollide(player, mobs, True)
+    for hit in hits:
+        m = Mob()
+        all_sprites.add(m)
+        mobs.add(m)
 
-    # Move and draw obstacles
-    obstacle_list = move_obstacles(obstacle_list)
-    draw_obstacles(obstacle_list)
-
-    # Check for collisions
-    if check_collision(obstacle_list):
+    if hits:
+        # running = False
+        LIVES -= 1
+    if LIVES == 0:
         running = False
 
-    # Display score
-    score_display = font.render(str(score), True, BLACK)
-    screen.blit(score_display, (SCREEN_WIDTH // 2, 50))
+    # Draw / render
 
-    # Update the display
+    y1 += 5
+    y2 += 5
+
+    if y1 >= background_height:
+        y1 = -background_height
+    if y2 >= background_height:
+        y2 = -background_height
+
+    screen.blit(background, (0, y1))
+    screen.blit(background, (0, y2))
+
+    all_sprites.draw(screen)
+
+    lives_text = font.render("Lives: " + str(LIVES), True, WHITE)
+    screen.blit(lives_text, (10, 10))
+
     pygame.display.update()
 
-    # Frame rate
-    pygame.time.Clock().tick(30)
+arduino.close()
 
-# Quit Pygame
 pygame.quit()
-sys.exit()
