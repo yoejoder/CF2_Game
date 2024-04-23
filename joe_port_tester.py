@@ -3,7 +3,7 @@ import serial
 arduino = serial.Serial()
 
 arduino.baudrate = 9600
-arduino.port = '/dev/cu.usbserial-110'
+arduino.port = '/dev/cu.usbserial-110' #change to port, find with arduino
 arduino.open()
 
 

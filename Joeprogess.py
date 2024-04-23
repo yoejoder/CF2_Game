@@ -8,97 +8,64 @@ background music link: https://www.youtube.com/watch?v=fnOv8MvTukQ
 arduino + python help: https://projecthub.arduino.cc/ansh2919/serial-communication-between-python-and-arduino-663756
 
 '''
-import pygame, sys, random, math, serial
-from pygame.locals import *
+import pygame
+import serial
+import sys
+import random
 
-WIDTH = 800
-HEIGHT = 800
+WIDTH, HEIGHT = 800, 800
 FPS = 60
 LIVES = 5
-
-# define colors
 WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
-BLUE = (0, 0, 255)
 
-arduino = serial.Serial()
-
-arduino.baudrate = 9600
-arduino.port = '/dev/cu.usbserial-110'
-arduino.open()
-packet = arduino.readline().decode('utf-8').strip()
-
-
-# initialize pygame and create window
 pygame.init()
 pygame.mixer.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("SpaceFlee")
 clock = pygame.time.Clock()
+arduino = serial.Serial('/dev/cu.usbserial-110', 9600)
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.transform.scale(player_image, (30,55))
+        super().__init__()
+        self.image = pygame.transform.scale(player_image, (30, 55))
         self.image.set_colorkey(WHITE)
         self.rect = self.image.get_rect()
-        self.rect.centerx = WIDTH / 2
+        self.rect.centerx = WIDTH // 2
         self.rect.bottom = HEIGHT - 10
-        self.speedx = 0
+        self.speedx = 50
 
-def update(self):
-    if arduino.in_waiting:
-        if packet == "LEFT":
-            self.speedx = -5
-        elif packet == "RIGHT":
-            self.speedx = 5
-        elif packet == "FORWARD":
-            self.speedx = 0
-        else:
-            print("Unrecognized command") 
-
-    self.rect.x += self.speedx
-    if self.rect.right > WIDTH:
-        self.rect.right = WIDTH
-    if self.rect.left < 0:
-        self.rect.left = 0
-
-
-    # def powerup(self):
-        # power = Power(self.rect.centerx, self.rect.top)
-
+    def update(self):
+        if arduino.in_waiting > 0:
+            line = arduino.readline().decode('utf-8').strip()
+            if line == "LEFT":
+                self.rect.x -= self.speedx
+            elif line == "RIGHT":
+                self.rect.x += self.speedx
+            self.rect.x = max(0, min(WIDTH - self.rect.width, self.rect.x))
 
 class Mob(pygame.sprite.Sprite):
     def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.transform.scale(comet_image, (25,55))
+        super().__init__()
+        self.image = pygame.transform.scale(comet_image, (25, 55))
         self.image.set_colorkey(WHITE)
         self.rect = self.image.get_rect()
         self.rect.x = random.randrange(0, WIDTH - self.rect.width)
-        self.rect.y = random.randrange(-100,-40)
-        self.speedy = random.randrange(1,8)
-        self.speedx = random.randrange(-3,3)
-    
+        self.rect.y = random.randrange(-100, -40)
+        self.speedy = random.randrange(1, 8)
+        self.speedx = random.randrange(-3, 3)
+
     def update(self):
         self.rect.x += self.speedx
         self.rect.y += self.speedy
-        if self.rect.top > HEIGHT + 10 or self.rect.left < -25 or self.rect.right > WIDTH + 20:
+        if self.rect.top > HEIGHT or self.rect.left < -25 or self.rect.right > WIDTH + 20:
             self.rect.x = random.randrange(0, WIDTH - self.rect.width)
-            self.rect.y = random.randrange(-100,-40)
-            self.speedy = random.randrange(1,8)
+            self.rect.y = random.randrange(-100, -40)
 
-
-# load all game graphics
 background = pygame.image.load('galaxy.jpg')
-background = pygame.transform.scale(background, (WIDTH + 50, HEIGHT))
-background_height = background.get_height()
+background = pygame.transform.scale(background, (WIDTH, HEIGHT))
 player_image = pygame.image.load('spaceship_up.png').convert()
 comet_image = pygame.image.load('comet_up.png').convert()
-
-y1 = 0
-y2 = background_height
 
 all_sprites = pygame.sprite.Group()
 mobs = pygame.sprite.Group()
@@ -110,63 +77,32 @@ for i in range(8):
     mobs.add(m)
 
 pygame.mixer.music.load('the-moon.wav')
-pygame.mixer.music.play(-1, 0.0)
-musicPlaying = True
+pygame.mixer.music.play(-1)
 
 font = pygame.font.SysFont(None, 36)
 
-# Game loop
 running = True
 while running:
-    # keep loop running at the right speed
     clock.tick(FPS)
-    # Process input (events)
     for event in pygame.event.get():
-        # check for closing window
         if event.type == pygame.QUIT:
             running = False
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                player.powerup()
 
-    # Update
     all_sprites.update()
 
-
-
-    # check to see if a comet hit the player
     hits = pygame.sprite.spritecollide(player, mobs, True)
-    for hit in hits:
-        m = Mob()
-        all_sprites.add(m)
-        mobs.add(m)
-
     if hits:
-        # running = False
         LIVES -= 1
-    if LIVES == 0:
-        running = False
+        if LIVES == 0:
+            running = False
 
-    # Draw / render
-
-    y1 += 5
-    y2 += 5
-
-    if y1 >= background_height:
-        y1 = -background_height
-    if y2 >= background_height:
-        y2 = -background_height
-
-    screen.blit(background, (0, y1))
-    screen.blit(background, (0, y2))
-
+    screen.fill(WHITE)
+    screen.blit(background, (0, 0))
     all_sprites.draw(screen)
-
-    lives_text = font.render("Lives: " + str(LIVES), True, WHITE)
+    lives_text = font.render(f"Lives: {LIVES}", True, WHITE)
     screen.blit(lives_text, (10, 10))
-
-    pygame.display.update()
+    pygame.display.flip()
 
 arduino.close()
-
 pygame.quit()
+sys.exit()
