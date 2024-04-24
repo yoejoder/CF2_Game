@@ -1,6 +1,7 @@
 # space image source: https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.pexels.com%2Fsearch%2Fspace%2520background%2F&psig=AOvVaw3J25w2RRPNARpyiLT2cJOu&ust=1713304119399000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCPDPh62ZxYUDFQAAAAAdAAAAABAE
 # spaceship image source: https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.istockphoto.com%2Fillustrations%2Fspaceship&psig=AOvVaw2vckoaUA3y9-mDd2MJoRlV&ust=1713304202156000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCOi2tNSZxYUDFQAAAAAdAAAAABAE
 # comet image link: https://www.google.com/url?sa=i&url=https%3A%2F%2Fm.youtube.com%2Fwatch%3Fv%3DmbZfhJeNx7c&psig=AOvVaw2X7D_DW_XsBBgWmRc-EYCy&ust=1713461913505000&source=images&cd=vfe&opi=89978449&ved=0CBAQjRxqFwoTCPj_nJflyYUDFQAAAAAdAAAAABAE
+# dog bone image: https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.freepik.com%2Fpremium-vector%2Ftoy-bone-icon-chewing-puppy-treat-symbol_34264712.htm&psig=AOvVaw08b2UQ-5aNgRRAzTd7OiFH&ust=1713572817492000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCND3h7CCzYUDFQAAAAAdAAAAABAE
 
 import pygame, sys, random
 from pygame.locals import *
@@ -27,6 +28,9 @@ foodCounter = 0
 NEWFOOD = 500
 FOODSIZE = 90
 
+boneImage = pygame.image.load('bone.png')
+boneImage = pygame.transform.scale(boneImage, (100, 50))
+
 player = pygame.Rect(screen_width/2, screen_height - 100, 50, 50)
 playerImage = pygame.image.load('spaceship.png')
 playerStretchedImage = pygame.transform.scale(playerImage, (60, 60))
@@ -37,7 +41,6 @@ for i in range(numberFood):
     foods.append(pygame.Rect(random.randint(0, screen_width - FOODSIZE), random.randint(0, screen_height - FOODSIZE),
                              FOODSIZE, FOODSIZE))
 
-# Movement Variables
 moveLeft = False
 moveRight = False
 
@@ -46,7 +49,6 @@ lives = 5
 
 font = pygame.font.SysFont(None, 36)
 
-# Running the game loop
 while True:
     # Checking for events
     for event in pygame.event.get():
@@ -111,6 +113,7 @@ while True:
         screen.blit(pygame.transform.scale(cometImage, (FOODSIZE, FOODSIZE-10)), food)
 
     screen.blit(playerStretchedImage, player)
+    screen.blit(boneImage, (400, 400))
 
     lives_text = font.render("Lives: " + str(lives), True, WHITE)
     screen.blit(lives_text, (10, 10))
