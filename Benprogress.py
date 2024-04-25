@@ -126,7 +126,7 @@ while True:
         playerStretchedImage = pygame.transform.scale(playerImage, (60, 60))
     else:
         playerImage = pygame.image.load('spaceship.png')
-        playerStretchedImage = pygame.transform.scale(playerImage, (60, 60))
+        playerStretchedImage = pygame.transform.scale(playerImage, (40, 70))
 
     # draw the Comet
     for Comet in Comets[:]:
