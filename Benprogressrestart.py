@@ -118,7 +118,7 @@ background_height = background.get_height()
 player_image = pygame.image.load('spaceship_up.png').convert()
 comet_image = pygame.image.load('comet_up.png').convert()
 bone_image = pygame.image.load('bone.png').convert()
-asteroid_image = pygame.image.load('asteroid.jpg').convert()
+asteroid_image = pygame.image.load('asteroid.png').convert()
 
 y1 = 0
 y2 = background_height
