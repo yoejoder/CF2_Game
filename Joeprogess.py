@@ -82,7 +82,7 @@ comet_image = pygame.image.load('comet_up.png').convert()
 y1 = 0
 y2 = background_height
 
-
+score = 0
 
 all_sprites = pygame.sprite.Group()
 mobs = pygame.sprite.Group()
@@ -99,11 +99,21 @@ pygame.mixer.music.play(-1)
 font = pygame.font.SysFont(None, 36)
 
 running = True
+start_time = pygame.time.get_ticks()
+
 while running:
     clock.tick(FPS)
+
+    elapsed_time = (pygame.time.get_ticks() - start_time) / 10  # seconds
+    score = int(elapsed_time)
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+            
+
+
+
 
     all_sprites.update()
 
@@ -129,7 +139,10 @@ while running:
     screen.blit(background, (0, y1))
     screen.blit(background, (0, y2))
 
+    score_text = font.render(f"Score: {score}", True, WHITE)
+    screen.blit(score_text, (600, 10))
 
+print(f'Your Score: {score}')
 arduino.close()
 pygame.quit()
 sys.exit()
