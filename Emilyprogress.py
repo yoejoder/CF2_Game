@@ -158,7 +158,7 @@ while True:
     lives_text = font.render("Lives: " + str(lives), True, WHITE)
     screen.blit(lives_text, (10, 10))
 
-    if lives == 0:
+    if lives <= 0:
         pygame.quit()
         sys.exit()
 
