@@ -39,9 +39,9 @@ class Player(pygame.sprite.Sprite):
         if arduino.in_waiting > 0:
             line = arduino.readline().decode('utf-8').strip()
             if line == "LEFT":
-                self.rect.x -= self.speedx
-            elif line == "RIGHT":
                 self.rect.x += self.speedx
+            elif line == "RIGHT":
+                self.rect.x -= self.speedx
             self.rect.x = max(0, min(WIDTH - self.rect.width, self.rect.x))
 
 class Mob(pygame.sprite.Sprite):
