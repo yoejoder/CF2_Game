@@ -195,7 +195,7 @@ while running:
 
     if comet_hits:
         LIVES -= 1
-    if LIVES == 0:
+    if LIVES <= 0:
         running = False
 
     y1 += 5
