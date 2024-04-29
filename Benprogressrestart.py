@@ -62,8 +62,8 @@ class Comet(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = random.randrange(0, WIDTH - self.rect.width)
         self.rect.y = random.randrange(-100,-40)
-        self.speedy = random.randrange(1,8)
-        self.speedx = random.randrange(-3,3)
+        self.speedy = random.randrange(4,6)
+        self.speedx = random.randrange(-2,3)
     
     def update(self):
         self.rect.x += self.speedx
@@ -76,13 +76,13 @@ class Comet(pygame.sprite.Sprite):
 class Asteroid(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.transform.scale(asteroid_image, (200,190))
-        self.image.set_colorkey(WHITE)
+        self.image = pygame.transform.scale(asteroid_image, (100,95))
+        self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.rect.x = random.randrange(0, WIDTH - self.rect.width)
         self.rect.y = random.randrange(-100,-40)
-        self.speedy = random.randrange(1,4)
-        self.speedx = random.randrange(-1,1)
+        self.speedy = random.randrange(2,4)
+        self.speedx = random.randrange(-1,2)
     
     def update(self):
         self.rect.x += self.speedx
@@ -118,7 +118,7 @@ background_height = background.get_height()
 player_image = pygame.image.load('spaceship_up.png').convert()
 comet_image = pygame.image.load('comet_up.png').convert()
 bone_image = pygame.image.load('bone.png').convert()
-asteroid_image = pygame.image.load('asteroid.png').convert()
+asteroid_image = pygame.image.load('asteroid.png')
 
 y1 = 0
 y2 = background_height
@@ -198,8 +198,8 @@ while running:
     if LIVES <= 0:
         running = False
 
-    y1 += 5
-    y2 += 5
+    y1 += 4
+    y2 += 4
 
     if y1 >= background_height:
         y1 = -background_height
