@@ -190,7 +190,7 @@ while running:
         bones.add(b)
     
     if bone_hits:
-        LIVES += 3
+        LIVES += 2
 
 
     # check to see if a comet hit the player
