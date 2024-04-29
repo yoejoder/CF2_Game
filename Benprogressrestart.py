@@ -42,8 +42,15 @@ class Player(pygame.sprite.Sprite):
         keystate = pygame.key.get_pressed()
         if keystate[pygame.K_LEFT]:
             self.speedx = -5
-        if keystate[pygame.K_RIGHT]:
+            player_image = pygame.image.load('spaceshipleft.png')
+            self.image = pygame.transform.scale(player_image, (40, 40))
+        elif keystate[pygame.K_RIGHT]:
             self.speedx = 5
+            player_image = pygame.image.load('spaceshipright.png')
+            self.image = pygame.transform.scale(player_image, (40, 40))
+        else:
+            player_image = pygame.image.load('spaceship_up.png')
+            self.image = pygame.transform.scale(player_image, (30, 55))
         self.rect.x += self.speedx
         if self.rect.right > WIDTH:
             self.rect.right = WIDTH
@@ -71,7 +78,7 @@ class Comet(pygame.sprite.Sprite):
         if self.rect.top > HEIGHT + 10 or self.rect.left < -25 or self.rect.right > WIDTH + 20:
             self.rect.x = random.randrange(0, WIDTH - self.rect.width)
             self.rect.y = random.randrange(-100,-40)
-            self.speedy = random.randrange(1,8)
+            self.speedy = random.randrange(4,6)
 
 class Asteroid(pygame.sprite.Sprite):
     def __init__(self):
@@ -90,7 +97,7 @@ class Asteroid(pygame.sprite.Sprite):
         if self.rect.top > HEIGHT + 10 or self.rect.left < -25 or self.rect.right > WIDTH + 20:
             self.rect.x = random.randrange(0, WIDTH - self.rect.width)
             self.rect.y = random.randrange(-100,-40)
-            self.speedy = random.randrange(1,4)
+            self.speedy = random.randrange(2,4)
 
 class Bone(pygame.sprite.Sprite):
     def __init__(self):
@@ -183,7 +190,7 @@ while running:
         bones.add(b)
     
     if bone_hits:
-        LIVES += 3
+        LIVES += 2
 
 
     # check to see if a comet hit the player
