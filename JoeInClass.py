@@ -13,7 +13,7 @@ import serial
 import sys
 import random
 
-WIDTH, HEIGHT = 800, 800
+WIDTH, HEIGHT = 1000, 800
 FPS = 60
 LIVES = 5
 WHITE = (255, 255, 255)
@@ -54,16 +54,6 @@ class Player(pygame.sprite.Sprite):
             self.rect.x -= self.speedx
         if self.move_right:
             self.rect.x += self.speedx
-
-        if self.move_left:
-            playerImage = pygame.image.load('spaceshipleft.png')
-            self.image = pygame.transform.scale(playerImage, (60, 60))
-        elif self.move_right:
-            playerImage = pygame.image.load('spaceshipright.png')
-            self.image = pygame.transform.scale(playerImage, (60, 60))
-        else:
-            playerImage = pygame.image.load('spaceship.png')
-            self.image = pygame.transform.scale(playerImage, (50, 75))
 
 class Mob(pygame.sprite.Sprite):
     def __init__(self):
