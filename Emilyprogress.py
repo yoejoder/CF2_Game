@@ -33,12 +33,18 @@ CometCounter = 0
 NEWCOMET = 100
 COMETSIZE = 90
 
+numberBone = 3
+BoneCounter = 0
+NEWBONE = 170
+BONESIZE = 50
+
 boneImage = pygame.image.load('bone.png')
 boneImage = pygame.transform.scale(boneImage, (100, 50))
 
 player = pygame.Rect(screen_width/2, screen_height - 100, 50, 50)
 playerImage = pygame.image.load('spaceship.png')
 playerStretchedImage = pygame.transform.scale(playerImage, (60, 60))
+
 cometImage = pygame.image.load('comet.png')
 comet_height = cometImage.get_height()
 
@@ -47,9 +53,15 @@ for i in range(numberComet):
     comets.append(pygame.Rect(random.randint(0, screen_width - COMETSIZE), random.randint(0, screen_height - COMETSIZE),
                              COMETSIZE, COMETSIZE))
 
+bones = []
+for i in range(numberBone):
+    bones.append(pygame.Rect(random.randint(0, screen_width - BONESIZE), random.randint(0, screen_height - BONESIZE),
+                             BONESIZE, BONESIZE))
+
 moveLeft = False
 moveRight = False
 CometDown = True
+BoneDown = True
 
 MOVESPEED = 5
 lives = 5
@@ -85,15 +97,19 @@ while True:
             # if event.key == K_x:
             #     player.top = random.randint(0,screen_height - player.height)
             #     player.left = random.randint(0, screen_width - player.width)
-
-        if event.type == MOUSEBUTTONUP:
-            comets.append(pygame.Rect(event.pos[0], event.pos[1], COMETSIZE, COMETSIZE))
+        
 
     CometCounter += 1
     if CometCounter >= NEWCOMET:
         CometCounter = 0
         comets.append(pygame.Rect(random.randint(0, screen_width - COMETSIZE), random.randint(0, screen_height - COMETSIZE),
                                  COMETSIZE, COMETSIZE))
+
+    BoneCounter += 1
+    if BoneCounter >= NEWBONE:
+        BoneCounter = 0
+        bones.append(pygame.Rect(random.randint(0, screen_width - BONESIZE), random.randint(0, screen_height - BONESIZE),
+                                 BONESIZE, BONESIZE))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -131,8 +147,13 @@ while True:
             lives -= 1
         screen.blit(pygame.transform.scale(cometImage, (COMETSIZE, COMETSIZE-10)), comet)
 
+    for bone in bones[:]:
+        if player.colliderect(bone):
+            bones.remove(bone)
+            lives += 1
+        screen.blit(pygame.transform.scale(boneImage, (BONESIZE, BONESIZE-10)), bone)
+
     screen.blit(playerStretchedImage, player)
-    screen.blit(boneImage, (400, 400))
 
     lives_text = font.render("Lives: " + str(lives), True, WHITE)
     screen.blit(lives_text, (10, 10))

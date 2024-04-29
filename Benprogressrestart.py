@@ -42,8 +42,15 @@ class Player(pygame.sprite.Sprite):
         keystate = pygame.key.get_pressed()
         if keystate[pygame.K_LEFT]:
             self.speedx = -5
-        if keystate[pygame.K_RIGHT]:
+            player_image = pygame.image.load('spaceshipleft.png')
+            self.image = pygame.transform.scale(player_image, (40, 40))
+        elif keystate[pygame.K_RIGHT]:
             self.speedx = 5
+            player_image = pygame.image.load('spaceshipright.png')
+            self.image = pygame.transform.scale(player_image, (40, 40))
+        else:
+            player_image = pygame.image.load('spaceship_up.png')
+            self.image = pygame.transform.scale(player_image, (30, 55))
         self.rect.x += self.speedx
         if self.rect.right > WIDTH:
             self.rect.right = WIDTH
