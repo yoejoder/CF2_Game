@@ -4,6 +4,9 @@
 # comet image link: https://www.google.com/url?sa=i&url=https%3A%2F%2Fm.youtube.com%2Fwatch%3Fv%3DmbZfhJeNx7c&psig=AOvVaw2X7D_DW_XsBBgWmRc-EYCy&ust=1713461913505000&source=images&cd=vfe&opi=89978449&ved=0CBAQjRxqFwoTCPj_nJflyYUDFQAAAAAdAAAAABAE
 # background music link: https://www.youtube.com/watch?v=fnOv8MvTukQ
 # asteroid image source: https://www.cleanpng.com/png-planet-cartoon-green-moon-466868/ 
+# comet hit sound effect: https://www.youtube.com/watch?v=wOh41654QFg
+# asteroid hit sound effect: https://www.youtube.com/watch?v=h3cZFqppGRE
+# bone pickup sound effect: https://www.youtube.com/watch?v=iJe4k2AMOk4
 
 import pygame, sys, random, math
 from pygame.locals import *
@@ -24,7 +27,7 @@ BLUE = (0, 0, 255)
 pygame.init()
 pygame.mixer.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("SpaceFlee")
+pygame.display.set_caption("Cosmic Canine")
 clock = pygame.time.Clock()
 
 class Player(pygame.sprite.Sprite):
@@ -69,7 +72,7 @@ class Comet(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = random.randrange(0, WIDTH - self.rect.width)
         self.rect.y = random.randrange(-100,-40)
-        self.speedy = random.randrange(4,6)
+        self.speedy = random.randrange(5,6)
         self.speedx = random.randrange(-2,3)
     
     def update(self):
@@ -78,26 +81,44 @@ class Comet(pygame.sprite.Sprite):
         if self.rect.top > HEIGHT + 10 or self.rect.left < -25 or self.rect.right > WIDTH + 20:
             self.rect.x = random.randrange(0, WIDTH - self.rect.width)
             self.rect.y = random.randrange(-100,-40)
-            self.speedy = random.randrange(4,6)
+            self.speedy = random.randrange(5,6)
             self.speedx = random.randrange(-2,3)
 
 class Asteroid(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.transform.scale(asteroid_image, (100,95))
-        self.image.set_colorkey(BLACK)
+        self.image_orig = pygame.transform.scale(asteroid_image, (100,95))
+        self.image_orig.set_colorkey(BLACK)
+        self.image = self.image_orig.copy()
         self.rect = self.image.get_rect()
+        self.radius = int(self.rect.width * .85 / 2)
+        # pygame.draw.circle(self.image, RED, self.rect.center, self.radius)
         self.rect.x = random.randrange(0, WIDTH - self.rect.width)
         self.rect.y = random.randrange(-100,-40)
         self.speedy = random.randrange(2,4)
         self.speedx = random.randrange(-1,2)
-    
+        self.rot = 0
+        self.rotate_speed = random.randrange(-8,8)
+        self.last_update = pygame.time.get_ticks()
+
+    def rotate(self):
+        present = pygame.time.get_ticks()
+        if present - self.last_update > 50:
+            self.last_update = present
+            self.rot = (self.rot + self.rotate_speed) % 360
+            new_image = pygame.transform.rotate(self.image_orig, self.rot)
+            old_center = self.rect.center
+            self.image = new_image
+            self.rect = self.image.get_rect()
+            self.rect.center = old_center
+
     def update(self):
+        self.rotate()
         self.rect.x += self.speedx
         self.rect.y += self.speedy
-        if self.rect.top > HEIGHT + 10 or self.rect.left < -25 or self.rect.right > WIDTH + 20:
+        if self.rect.top > HEIGHT + 100 or self.rect.left < -100 or self.rect.right > WIDTH + 100:
             self.rect.x = random.randrange(0, WIDTH - self.rect.width)
-            self.rect.y = random.randrange(-100,-40)
+            self.rect.y = random.randrange(-200,-100)
             self.speedy = random.randrange(2,4)
             self.speedx = random.randrange(-1,2)
 
@@ -113,20 +134,26 @@ class Bone(pygame.sprite.Sprite):
     
     def update(self):
         self.rect.y += self.speedy
-        if self.rect.top > HEIGHT + 10 or self.rect.left < -25 or self.rect.right > WIDTH + 20:
+        if self.rect.top > HEIGHT + 25 or self.rect.left < -25 or self.rect.right > WIDTH + 25:
             self.rect.x = random.randrange(0, WIDTH - self.rect.width)
             self.rect.y = random.randrange(-100,-40)
             self.speedy = random.randrange(1,2)
 
-
+# load all game sounds
+hit_sound = pygame.mixer.Sound('hit.wav')
+clang_sound = pygame.mixer.Sound('clang.wav')
+bone_sound =  pygame.mixer.Sound('bone.wav')
+hit_sound.set_volume(.5)
+clang_sound.set_volume(1)
+bone_sound.set_volume(1)
 
 # load all game graphics
 background = pygame.image.load('galaxy.jpg')
 background = pygame.transform.scale(background, (WIDTH + 50, HEIGHT))
 background_height = background.get_height()
-player_image = pygame.image.load('spaceship_up.png').convert()
-comet_image = pygame.image.load('comet_up.png').convert()
-bone_image = pygame.image.load('bone.png').convert()
+player_image = pygame.image.load('spaceship_up.png')
+comet_image = pygame.image.load('comet_up.png')
+bone_image = pygame.image.load('bone.png')
 asteroid_image = pygame.image.load('asteroid.png')
 
 y1 = 0
@@ -138,7 +165,7 @@ bones = pygame.sprite.Group()
 asteroids = pygame.sprite.Group()
 player = Player()
 all_sprites.add(player)
-for i in range(10):
+for i in range(12):
     c = Comet()
     all_sprites.add(c)
     comets.add(c)
@@ -146,7 +173,7 @@ for i in range(1):
     b = Bone()
     all_sprites.add(b)
     bones.add(b)
-for i in range(4):
+for i in range(5):
     a = Asteroid()
     all_sprites.add(a)
     asteroids.add(a)
@@ -175,14 +202,15 @@ while running:
     # update
     all_sprites.update()
 
-    asteroid_comet_hits = pygame.sprite.groupcollide(asteroids, comets, False, True)
+    asteroid_comet_hits = pygame.sprite.groupcollide(asteroids, comets, False, True, pygame.sprite.collide_circle)
     for asteroid_comet in asteroid_comet_hits:
         c = Comet()
         all_sprites.add(c)
         comets.add(c)
 
-    asteroid_hits = pygame.sprite.spritecollide(player, asteroids, True)
+    asteroid_hits = pygame.sprite.spritecollide(player, asteroids, True, pygame.sprite.collide_circle)
     for asteroid in asteroid_hits:
+        clang_sound.play()
         a = Asteroid()
         all_sprites.add(a)
         asteroids.add(a)
@@ -193,6 +221,7 @@ while running:
 
     bone_hits = pygame.sprite.spritecollide(player, bones, True)
     for bone in bone_hits:
+        bone_sound.play()
         b = Bone()
         all_sprites.add(b)
         bones.add(b)
@@ -204,6 +233,7 @@ while running:
     # check to see if a comet hit the player
     comet_hits = pygame.sprite.spritecollide(player, comets, True)
     for comet in comet_hits:
+        hit_sound.play()
         c = Comet()
         all_sprites.add(c)
         comets.add(c)
