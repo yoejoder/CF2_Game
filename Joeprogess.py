@@ -9,14 +9,16 @@ arduino + python help: https://projecthub.arduino.cc/ansh2919/serial-communicati
 3d Rocket Model: https://www.myminifactory.com/object/3d-print-gcreate-official-rocket-ship-55463
 '''
 import pygame
-import serial
+import serial #install pyserial
 import sys
 import random
 
 WIDTH, HEIGHT = 800, 800
 FPS = 60
 LIVES = 5
+
 WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
 
 pygame.init()
 pygame.mixer.init()
@@ -73,8 +75,8 @@ class Mob(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = random.randrange(0, WIDTH - self.rect.width)
         self.rect.y = random.randrange(-100, -40)
-        self.speedy = random.randrange(1, 8)
-        self.speedx = random.randrange(-3, 3)
+        self.speedy = random.randrange(4, 6)
+        self.speedx = random.randrange(-2, 3)
 
     def update(self):
         self.rect.x += self.speedx
@@ -82,12 +84,55 @@ class Mob(pygame.sprite.Sprite):
         if self.rect.top > HEIGHT or self.rect.left < -25 or self.rect.right > WIDTH + 20:
             self.rect.x = random.randrange(0, WIDTH - self.rect.width)
             self.rect.y = random.randrange(-100, -40)
+            self.speedy = random.randrange(4, 6)
+
+
+class Bone(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.transform.scale(bone_image, (57,25))
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randrange(0, WIDTH - self.rect.width)
+        self.rect.y = random.randrange(-100,-40)
+        self.speedy = random.randrange(1,2)
+    
+    def update(self):
+        self.rect.y += self.speedy
+        if self.rect.top > HEIGHT + 10 or self.rect.left < -25 or self.rect.right > WIDTH + 20:
+            self.rect.x = random.randrange(0, WIDTH - self.rect.width)
+            self.rect.y = random.randrange(-100,-40)
+            self.speedy = random.randrange(4,6)
+
+class Asteroid(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.transform.scale(asteroid_image, (100,95))
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randrange(0, WIDTH - self.rect.width)
+        self.rect.y = random.randrange(-100,-40)
+        self.speedy = random.randrange(2,4)
+        self.speedx = random.randrange(-1,2)
+    
+    def update(self):
+        self.rect.x += self.speedx
+        self.rect.y += self.speedy
+        if self.rect.top > HEIGHT + 10 or self.rect.left < -25 or self.rect.right > WIDTH + 20:
+            self.rect.x = random.randrange(0, WIDTH - self.rect.width)
+            self.rect.y = random.randrange(-100,-40)
+            self.speedy = random.randrange(1,4)
+
+
 
 background = pygame.image.load('galaxy.jpg')
 background = pygame.transform.scale(background, (WIDTH + 50, HEIGHT))
 background_height = background.get_height()
 player_image = pygame.image.load('spaceship_up.png').convert()
 comet_image = pygame.image.load('comet_up.png').convert()
+bone_image = pygame.image.load('bone.png').convert()
+asteroid_image = pygame.image.load('asteroid.png')
+
 
 y1 = 0
 y2 = background_height
@@ -96,12 +141,24 @@ score = 0
 
 all_sprites = pygame.sprite.Group()
 mobs = pygame.sprite.Group()
+bones = pygame.sprite.Group()
+asteroids = pygame.sprite.Group()
+
+
 player = Player()
 all_sprites.add(player)
-for i in range(8):
+for i in range(10):
     m = Mob()
     all_sprites.add(m)
     mobs.add(m)
+for i in range(1):
+    b = Bone()
+    all_sprites.add(b)
+    bones.add(b)
+for i in range(6):
+    a = Asteroid()
+    all_sprites.add(a)
+    asteroids.add(a)
 
 pygame.mixer.music.load('the-moon.wav')
 pygame.mixer.music.play(-1)
@@ -130,8 +187,27 @@ while running:
     hits = pygame.sprite.spritecollide(player, mobs, True)
     if hits:
         LIVES -= 1
-        if LIVES <= 0:
-            running = False
+    if LIVES <= 0:
+        running = False
+
+    bone_hits = pygame.sprite.spritecollide(player, bones, True)
+    for bone in bone_hits:
+        b = Bone()
+        all_sprites.add(b)
+        bones.add(b)
+    
+    if bone_hits:
+        LIVES += 2
+
+    asteroid_hits = pygame.sprite.spritecollide(player, asteroids, True)
+    for asteroid in asteroid_hits:
+        a = Asteroid()
+        all_sprites.add(a)
+        asteroids.add(a)
+
+    if asteroid_hits:
+        LIVES -= 2
+
 
     all_sprites.draw(screen)
     lives_text = font.render(f"Lives: {LIVES}", True, WHITE)
