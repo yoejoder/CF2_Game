@@ -79,6 +79,7 @@ class Comet(pygame.sprite.Sprite):
             self.rect.x = random.randrange(0, WIDTH - self.rect.width)
             self.rect.y = random.randrange(-100,-40)
             self.speedy = random.randrange(4,6)
+            self.speedx = random.randrange(-2,3)
 
 class Asteroid(pygame.sprite.Sprite):
     def __init__(self):
@@ -98,6 +99,7 @@ class Asteroid(pygame.sprite.Sprite):
             self.rect.x = random.randrange(0, WIDTH - self.rect.width)
             self.rect.y = random.randrange(-100,-40)
             self.speedy = random.randrange(2,4)
+            self.speedx = random.randrange(-1,2)
 
 class Bone(pygame.sprite.Sprite):
     def __init__(self):
@@ -172,6 +174,12 @@ while running:
 
     # update
     all_sprites.update()
+
+    asteroid_comet_hits = pygame.sprite.groupcollide(asteroids, comets, False, True)
+    for asteroid_comet in asteroid_comet_hits:
+        c = Comet()
+        all_sprites.add(c)
+        comets.add(c)
 
     asteroid_hits = pygame.sprite.spritecollide(player, asteroids, True)
     for asteroid in asteroid_hits:
