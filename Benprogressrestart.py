@@ -78,7 +78,7 @@ class Comet(pygame.sprite.Sprite):
         if self.rect.top > HEIGHT + 10 or self.rect.left < -25 or self.rect.right > WIDTH + 20:
             self.rect.x = random.randrange(0, WIDTH - self.rect.width)
             self.rect.y = random.randrange(-100,-40)
-            self.speedy = random.randrange(1,8)
+            self.speedy = random.randrange(4,6)
 
 class Asteroid(pygame.sprite.Sprite):
     def __init__(self):
@@ -97,7 +97,7 @@ class Asteroid(pygame.sprite.Sprite):
         if self.rect.top > HEIGHT + 10 or self.rect.left < -25 or self.rect.right > WIDTH + 20:
             self.rect.x = random.randrange(0, WIDTH - self.rect.width)
             self.rect.y = random.randrange(-100,-40)
-            self.speedy = random.randrange(1,4)
+            self.speedy = random.randrange(2,4)
 
 class Bone(pygame.sprite.Sprite):
     def __init__(self):
