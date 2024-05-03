@@ -200,6 +200,8 @@ while running:
         y1 += 4
         y2 += 4
 
+        LIVES = 5
+
         if y1 >= background_height:
             y1 = -background_height
         if y2 >= background_height:
@@ -305,6 +307,27 @@ while running:
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     current_state = STATE_START
+                    y1 = 0
+                    y2 = background_height
+
+                    all_sprites = pygame.sprite.Group()
+                    comets = pygame.sprite.Group()
+                    bones = pygame.sprite.Group()
+                    asteroids = pygame.sprite.Group()
+                    player = Player()
+                    all_sprites.add(player)
+                    for i in range(12):
+                        c = Comet()
+                        all_sprites.add(c)
+                        comets.add(c)
+                    for i in range(1):
+                        b = Bone()
+                        all_sprites.add(b)
+                        bones.add(b)
+                    for i in range(5):
+                        a = Asteroid()
+                        all_sprites.add(a)
+                        asteroids.add(a)
         y1 += 4
         y2 += 4
 
