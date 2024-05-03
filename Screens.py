@@ -99,22 +99,10 @@ class Asteroid(pygame.sprite.Sprite):
         self.speedy = random.randrange(2,4)
         self.speedx = random.randrange(-1,2)
         self.rot = 0
-        self.rotate_speed = random.randrange(-8,8)
+        # self.rotate_speed = random.randrange(-8,8)
         self.last_update = pygame.time.get_ticks()
 
-    def rotate(self):
-        present = pygame.time.get_ticks()
-        if present - self.last_update > 50:
-            self.last_update = present
-            self.rot = (self.rot + self.rotate_speed) % 360
-            new_image = pygame.transform.rotate(self.image_orig, self.rot)
-            old_center = self.rect.center
-            self.image = new_image
-            self.rect = self.image.get_rect()
-            self.rect.center = old_center
-
     def update(self):
-        self.rotate()
         self.rect.x += self.speedx
         self.rect.y += self.speedy
         if self.rect.top > HEIGHT + 100 or self.rect.left < -100 or self.rect.right > WIDTH + 100:
@@ -180,93 +168,159 @@ for i in range(5):
     asteroids.add(a)
 
 
+# State stuff 
+STATE_START = 0
+STATE_GAME = 1
+STATE_END = 2
+current_state = STATE_START
+
+
 pygame.mixer.music.load('the-moon.wav')
 pygame.mixer.music.play(-1, 0.0)
 musicPlaying = True
 
-font = pygame.font.SysFont(None, 36)
+font1 = pygame.font.SysFont(None, 36)
+font2 = pygame.font.SysFont(None, 18)
 
 # game loop
 running = True
 while running:
     # keep loop running at the right speed
     clock.tick(FPS)
-    timeAlive += 1
-    # Process input (events)
-    for event in pygame.event.get():
-        # check for closing window
-        if event.type == pygame.QUIT:
-            running = False
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                player.powerup()
 
-    if timeAlive % 500 == 0:
-        for i in range(2):  
+    if current_state == STATE_START:
+        # Process input (events)
+        for event in pygame.event.get():
+            # check for closing window
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    current_state = STATE_GAME
+        y1 += 4
+        y2 += 4
+
+        if y1 >= background_height:
+            y1 = -background_height
+        if y2 >= background_height:
+            y2 = -background_height
+
+        screen.blit(background, (0, y1))
+        screen.blit(background, (0, y2))
+
+        start_text1 = font2.render("Welcome to Cosmic Canine! Help the space pup Luna navigate through the treacherous galaxy.", True, WHITE)
+        start_text2 = font2.render("Colliding with asteriods and comets takes away lives while collecting bones gives you lives. Press the SPACE key to start", True, WHITE)
+
+        screen.blit(start_text1, (WIDTH-740, HEIGHT-500))
+        screen.blit(start_text2, (WIDTH-740, HEIGHT-460))
+        pygame.display.update()
+
+
+    elif current_state == STATE_GAME:
+        timeAlive += 1
+
+        # Process input (events)
+        for event in pygame.event.get():
+            # check for closing window
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    player.powerup()
+
+
+        if timeAlive % 500 == 0:
+            for i in range(2):  
+                c = Comet()
+                all_sprites.add(c)
+                comets.add(c)
+
+        # update
+        all_sprites.update()
+
+        asteroid_comet_hits = pygame.sprite.groupcollide(asteroids, comets, False, True, pygame.sprite.collide_circle)
+        for asteroid_comet in asteroid_comet_hits:
             c = Comet()
             all_sprites.add(c)
             comets.add(c)
 
-    # update
-    all_sprites.update()
+        asteroid_hits = pygame.sprite.spritecollide(player, asteroids, True, pygame.sprite.collide_circle)
+        for asteroid in asteroid_hits:
+            clang_sound.play()
+            a = Asteroid()
+            all_sprites.add(a)
+            asteroids.add(a)
 
-    asteroid_comet_hits = pygame.sprite.groupcollide(asteroids, comets, False, True, pygame.sprite.collide_circle)
-    for asteroid_comet in asteroid_comet_hits:
-        c = Comet()
-        all_sprites.add(c)
-        comets.add(c)
-
-    asteroid_hits = pygame.sprite.spritecollide(player, asteroids, True, pygame.sprite.collide_circle)
-    for asteroid in asteroid_hits:
-        clang_sound.play()
-        a = Asteroid()
-        all_sprites.add(a)
-        asteroids.add(a)
-
-    if asteroid_hits:
-        LIVES -= 2
+        if asteroid_hits:
+            LIVES -= 2
 
 
-    bone_hits = pygame.sprite.spritecollide(player, bones, True)
-    for bone in bone_hits:
-        bone_sound.play()
-        b = Bone()
-        all_sprites.add(b)
-        bones.add(b)
-    
-    if bone_hits:
-        LIVES += 2
+        bone_hits = pygame.sprite.spritecollide(player, bones, True)
+        for bone in bone_hits:
+            bone_sound.play()
+            b = Bone()
+            all_sprites.add(b)
+            bones.add(b)
+        
+        if bone_hits:
+            LIVES += 2
 
 
-    # check to see if a comet hit the player
-    comet_hits = pygame.sprite.spritecollide(player, comets, True)
-    for comet in comet_hits:
-        hit_sound.play()
-        c = Comet()
-        all_sprites.add(c)
-        comets.add(c)
+        # check to see if a comet hit the player
+        comet_hits = pygame.sprite.spritecollide(player, comets, True)
+        for comet in comet_hits:
+            hit_sound.play()
+            c = Comet()
+            all_sprites.add(c)
+            comets.add(c)
 
-    if comet_hits:
-        LIVES -= 1
-    if LIVES <= 0:
-        running = False
+        if comet_hits:
+            LIVES -= 1
+        if LIVES <= 0:
+            current_state = STATE_END
 
-    y1 += 4
-    y2 += 4
+        y1 += 4
+        y2 += 4
 
-    if y1 >= background_height:
-        y1 = -background_height
-    if y2 >= background_height:
-        y2 = -background_height
+        if y1 >= background_height:
+            y1 = -background_height
+        if y2 >= background_height:
+            y2 = -background_height
 
-    screen.blit(background, (0, y1))
-    screen.blit(background, (0, y2))
+        screen.blit(background, (0, y1))
+        screen.blit(background, (0, y2))
 
-    all_sprites.draw(screen)
+        all_sprites.draw(screen)
 
-    lives_text = font.render("Lives: " + str(LIVES), True, WHITE)
-    screen.blit(lives_text, (10, 10))
+        lives_text = font1.render("Lives: " + str(LIVES), True, WHITE)
+        screen.blit(lives_text, (10, 10))
 
-    pygame.display.update()
+        pygame.display.update()
+
+    elif current_state == STATE_END:
+        for event in pygame.event.get():
+            # check for closing window
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    current_state = STATE_START
+        y1 += 4
+        y2 += 4
+
+        if y1 >= background_height:
+            y1 = -background_height
+        if y2 >= background_height:
+            y2 = -background_height
+
+        screen.blit(background, (0, y1))
+        screen.blit(background, (0, y2))
+
+        start_text1 = font2.render("Thanks for playing!", True, WHITE)
+        start_text2 = font2.render("Press the SPACE key to restart", True, WHITE)
+
+        screen.blit(start_text1, (WIDTH-740, HEIGHT-500))
+        screen.blit(start_text2, (WIDTH-740, HEIGHT-460))
+        pygame.display.update()
 
 pygame.quit()
