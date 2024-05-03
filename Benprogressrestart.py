@@ -14,7 +14,7 @@ from pygame.locals import *
 WIDTH = 800
 HEIGHT = 800
 FPS = 60
-LIVES = 5
+LIVES = 900
 
 # define colors
 WHITE = (255, 255, 255)
@@ -141,7 +141,8 @@ class Bone(pygame.sprite.Sprite):
 
 # load all game sounds
 hit_sound = pygame.mixer.Sound('hit.wav')
-clang_sound = pygame.mixer.Sound('clang.wav')
+clang_sound = pygame.mixer.Sound('softclang.wav')
+# for VERY LOUD CLANGS load 'clang.wav' (funny)
 bone_sound =  pygame.mixer.Sound('bone.wav')
 hit_sound.set_volume(.5)
 clang_sound.set_volume(1)
@@ -180,6 +181,7 @@ for i in range(5):
 
 
 pygame.mixer.music.load('the-moon.wav')
+pygame.mixer.music.set_volume(0.5)
 pygame.mixer.music.play(-1, 0.0)
 musicPlaying = True
 
