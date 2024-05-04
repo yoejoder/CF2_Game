@@ -131,6 +131,7 @@ class Bone(pygame.sprite.Sprite):
 # load all game sounds
 hit_sound = pygame.mixer.Sound('hit.wav')
 clang_sound = pygame.mixer.Sound('softclang.wav')
+# for VERY LOUD CLANGS load 'clang.wav' (funny)
 bone_sound =  pygame.mixer.Sound('bone.wav')
 hit_sound.set_volume(.5)
 clang_sound.set_volume(1)
