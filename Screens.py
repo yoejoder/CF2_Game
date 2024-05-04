@@ -141,7 +141,7 @@ background = pygame.image.load('galaxy.jpg')
 background = pygame.transform.scale(background, (WIDTH + 50, HEIGHT))
 background_height = background.get_height()
 player_image = pygame.image.load('spaceship_up.png')
-comet_image = pygame.image.load('comet_up.png')
+comet_image = pygame.image.load('comet.png')
 bone_image = pygame.image.load('bone.png')
 asteroid_image = pygame.image.load('asteroid.png').convert_alpha()
 
