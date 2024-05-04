@@ -216,6 +216,7 @@ while running:
 
         screen.blit(start_text1, (WIDTH-740, HEIGHT-500))
         screen.blit(start_text2, (WIDTH-740, HEIGHT-460))
+        
         pygame.display.update()
 
 
