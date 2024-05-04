@@ -1,4 +1,4 @@
-# space image source: https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.pexels.com%2Fsearch%2Fspace%2520background%2F&psig=AOvVaw3J25w2RRPNARpyiLT2cJOu&ust=1713304119399000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCPDPh62ZxYUDFQAAAAAdAAAAABAE
+# galaxy image source: https://www.peakpx.com/en/hd-wallpaper-desktop-awntk 
 # spaceship image source: https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.istockphoto.com%2Fillustrations%2Fspaceship&psig=AOvVaw2vckoaUA3y9-mDd2MJoRlV&ust=1713304202156000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCOi2tNSZxYUDFQAAAAAdAAAAABAE
 # comet image link: https://www.google.com/url?sa=i&url=https%3A%2F%2Fm.youtube.com%2Fwatch%3Fv%3DmbZfhJeNx7c&psig=AOvVaw2X7D_DW_XsBBgWmRc-EYCy&ust=1713461913505000&source=images&cd=vfe&opi=89978449&ved=0CBAQjRxqFwoTCPj_nJflyYUDFQAAAAAdAAAAABAE
 # dog bone image: https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.freepik.com%2Fpremium-vector%2Ftoy-bone-icon-chewing-puppy-treat-symbol_34264712.htm&psig=AOvVaw08b2UQ-5aNgRRAzTd7OiFH&ust=1713572817492000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCND3h7CCzYUDFQAAAAAdAAAAABAE
@@ -42,7 +42,7 @@ boneImage = pygame.image.load('bone.png')
 boneImage = pygame.transform.scale(boneImage, (100, 50))
 
 player = pygame.Rect(screen_width/2, screen_height - 100, 50, 50)
-playerImage = pygame.image.load('spaceship.png')
+playerImage = pygame.image.load('spaceship_up.png')
 playerStretchedImage = pygame.transform.scale(playerImage, (60, 60))
 
 cometImage = pygame.image.load('comet.png')
@@ -137,7 +137,7 @@ while True:
         playerImage = pygame.image.load('spaceshipright.png')
         playerStretchedImage = pygame.transform.scale(playerImage, (60, 60))
     else:
-        playerImage = pygame.image.load('spaceship.png')
+        playerImage = pygame.image.load('spaceship_up.png')
         playerStretchedImage = pygame.transform.scale(playerImage, (40, 70))
 
     # draw the comet
