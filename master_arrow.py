@@ -16,6 +16,9 @@ HEIGHT = 800
 FPS = 60
 LIVES = 5
 timeAlive = 0
+score = 0
+freeze_score = False
+final_score = 0
 
 # define colors
 WHITE = (255, 255, 255)
@@ -30,6 +33,7 @@ pygame.mixer.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Cosmic Canine")
 clock = pygame.time.Clock()
+
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
@@ -185,24 +189,22 @@ font2 = pygame.font.SysFont(None, 18)
 
 # game loop
 running = True
+start_time = pygame.time.get_ticks()
 while running:
-    # keep loop running at the right speed
+    elapsed_time = (pygame.time.get_ticks() - start_time) / 10  
+    score = int(elapsed_time)
     clock.tick(FPS)
-
     if current_state == STATE_START:
-
         for event in pygame.event.get():
-            # check for closing window
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     current_state = STATE_GAME
+
+
         y1 += 4
         y2 += 4
-
-        LIVES = 5
-
         if y1 >= background_height:
             y1 = -background_height
         if y2 >= background_height:
@@ -210,47 +212,47 @@ while running:
 
         screen.blit(background, (0, y1))
         screen.blit(background, (0, y2))
-
         start_ship = pygame.transform.scale(player_image, (200, 320))
         start_ship_rect = start_ship.get_rect(center=(WIDTH // 2, HEIGHT // 2))
-        screen.blit(start_ship, (300,450))
-
+        screen.blit(start_ship, (300, 450))
+        start_font = pygame.font.SysFont(None, 27)
         start_text_lines = [
             "Welcome to Cosmic Canine!",
             "Help Luna the space pup navigate through the treacherous galaxy!",
+            "Use the LEFT and RIGHT arrow keys to move Luna in the game.",
             "Colliding with asteroids and comets takes away lives. Collecting bones gives you lives.",
             "Beware! the longer you survive, more asteroids and comets will come your way.",
-            "Press the SPACE key to start"
+            "Press the SPACE key to start."
         ]
-
-        start_font = pygame.font.SysFont(None, 27)
-
-        total_text_height = sum([start_font.size(line)[1] for line in start_text_lines])
-
-        y_start = (HEIGHT - total_text_height - 300) // 2
-
+        y_start = (HEIGHT - sum([start_font.size(line)[1] for line in start_text_lines])) -1100 // 2
         for i, line in enumerate(start_text_lines):
             rendered_text = start_font.render(line, True, WHITE)
-            text_rect = rendered_text.get_rect(center=(WIDTH // 2, y_start + i * 50))  # Adjust the vertical spacing
+            text_rect = rendered_text.get_rect(center=(WIDTH // 2, y_start + i * 50))
             screen.blit(rendered_text, text_rect)
-
         pygame.display.update()
-        
-
 
     elif current_state == STATE_GAME:
-        timeAlive += 1
-
         # Process input (events)
         for event in pygame.event.get():
             # check for closing window
             if event.type == pygame.QUIT:
                 running = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    player.powerup()
 
 
+        if LIVES > 0:
+            timeAlive += 1
+            score = int(elapsed_time)
+
+        if LIVES <= 0:
+            freeze_score = True  # Stop the score from updating  # Capture the final score at this point
+            current_state = STATE_END
+
+        if not freeze_score:
+            current_ticks = pygame.time.get_ticks()
+            final_score = int((current_ticks - start_time) / 10)  # Score is time in seconds
+
+
+            
         if timeAlive % 500 == 0:
             for i in range(2):  
                 c = Comet()
@@ -298,6 +300,7 @@ while running:
 
         if comet_hits:
             LIVES -= 1
+        
         if LIVES <= 0:
             current_state = STATE_END
 
@@ -317,19 +320,28 @@ while running:
         lives_text = font1.render("Lives: " + str(LIVES), True, WHITE)
         screen.blit(lives_text, (10, 10))
 
+        font = pygame.font.SysFont(None, 36)    
+        score_text = font.render(f"Score: {score}", True, WHITE)
+        screen.blit(score_text, (600, 10))
+
+
         pygame.display.update()
 
     elif current_state == STATE_END:
         for event in pygame.event.get():
-            # check for closing window
-            if event.type == pygame.QUIT:
-                running = False
-            elif event.type == pygame.KEYDOWN:
+            if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     current_state = STATE_START
-                    y1 = 0
-                    y2 = background_height
+                    LIVES = 5
+                    timeAlive = 0
+                    score = 0
+                    final_score = 0
+                    start_time = pygame.time.get_ticks()
+                    current_ticks = 0
+                    freeze_score=False
+                    elapsed_time = 0
 
+                    # Reinitialize sprites for a new game
                     all_sprites = pygame.sprite.Group()
                     comets = pygame.sprite.Group()
                     bones = pygame.sprite.Group()
@@ -348,9 +360,16 @@ while running:
                         a = Asteroid()
                         all_sprites.add(a)
                         asteroids.add(a)
+
+                    y1 = 0
+                    y2 = background_height
+
+                    pygame.mixer.music.play(-1, 0.0)
+            elif event.type == pygame.QUIT:
+                running = False
+
         y1 += 4
         y2 += 4
-
         if y1 >= background_height:
             y1 = -background_height
         if y2 >= background_height:
@@ -359,36 +378,17 @@ while running:
         screen.blit(background, (0, y1))
         screen.blit(background, (0, y2))
 
-
-        end_font = pygame.font.SysFont(None, 30)
-
-        start_text1 = end_font.render("Thanks for playing!", True, WHITE)
-        start_text2 = end_font.render("Press the SPACE key to restart", True, WHITE)
-        text_rect1 = start_text1.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 50))
-        text_rect2 = start_text2.get_rect(center=(WIDTH // 2, HEIGHT // 2))
-        
-        screen.blit(start_text1, text_rect1)
-        screen.blit(start_text2, text_rect2)
-
-        # start_text_lines = [
-        # "Thanks for playing!",
-        # "Press the SPACE key to restart."
-        # ]
-
-        # start_font = pygame.font.SysFont(None, 40)
-
-        # total_text_height = sum([start_font.size(line)[1] for line in start_text_lines])
-
-        # y_start = (HEIGHT - total_text_height) // 2
-
-        # for i, line in enumerate(start_text_lines):
-        #     rendered_text = start_font.render(line, True, WHITE)
-        #     text_rect = rendered_text.get_rect(center=(WIDTH // 2, y_start + i * 50))  # Adjust the vertical spacing
-        #     screen.blit(rendered_text, text_rect)
+        end_font = pygame.font.SysFont(None, 40)
+        end_text_lines = [
+            "Game Over!",
+            f"Final Score: {final_score}",
+            "Press SPACE to restart."
+        ]
+        y_start = (HEIGHT - sum([end_font.size(line)[1] for line in end_text_lines])) // 2
+        for i, line in enumerate(end_text_lines):
+            rendered_text = end_font.render(line, True, WHITE)
+            text_rect = rendered_text.get_rect(center=(WIDTH // 2, y_start + i * 50))
+            screen.blit(rendered_text, text_rect)
 
         pygame.display.update()
-
-
-        pygame.display.update()
-
 pygame.quit()
