@@ -1,13 +1,9 @@
-# SOURCES
-# arduino + python help: https://projecthub.arduino.cc/ansh2919/serial-communication-between-python-and-arduino-663756
-# 3d Rocket Model: https://www.myminifactory.com/object/3d-print-gcreate-official-rocket-ship-55463
+# space image source: https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.pexels.com%2Fsearch%2Fspace%2520background%2F&psig=AOvVaw3J25w2RRPNARpyiLT2cJOu&ust=1713304119399000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCPDPh62ZxYUDFQAAAAAdAAAAABAE
 # galaxy image source: https://www.peakpx.com/en/hd-wallpaper-desktop-awntk 
 # spaceship image source: https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.istockphoto.com%2Fillustrations%2Fspaceship&psig=AOvVaw2vckoaUA3y9-mDd2MJoRlV&ust=1713304202156000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCOi2tNSZxYUDFQAAAAAdAAAAABAE
 # comet image link: https://www.google.com/url?sa=i&url=https%3A%2F%2Fm.youtube.com%2Fwatch%3Fv%3DmbZfhJeNx7c&psig=AOvVaw2X7D_DW_XsBBgWmRc-EYCy&ust=1713461913505000&source=images&cd=vfe&opi=89978449&ved=0CBAQjRxqFwoTCPj_nJflyYUDFQAAAAAdAAAAABAE
 # background music link: https://www.youtube.com/watch?v=fnOv8MvTukQ
 # asteroid image source: https://www.cleanpng.com/png-planet-cartoon-green-moon-466868/ 
-# dog bone image: https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.freepik.com%2Fpremium-vector%2Ftoy-bone-icon-chewing-puppy-treat-symbol_34264712.htm&psig=AOvVaw08b2UQ-5aNgRRAzTd7OiFH&ust=1713572817492000&source=images&cd=vfe&opi=89978449&ved=0CBIQjRxqFwoTCND3h7CCzYUDFQAAAAAdAAAAABAE
-# dog head image: https://www.google.com/imgres?imgurl=https%3A%2F%2Fthumbs.dreamstime.com%2Fz%2Fshiba-inu-puppy-face-set-cute-cartoon-icon-logo-happy-dog-tongue-sticking-out-simple-vector-illustration-128772666.jpg&tbnid=dfbviOVtMiBMMM&vet=10CBwQxiAoBGoXChMI8Jj2hbLbhQMVAAAAAB0AAAAAEAc..i&imgrefurl=https%3A%2F%2Fwww.dreamstime.com%2Fshiba-inu-puppy-face-set-cute-cartoon-icon-logo-happy-dog-tongue-sticking-out-simple-vector-illustration-image128772666&docid=a6ygET3GYbyWxM&w=1600&h=1690&itg=1&q=brown%20shiba%20inu%20clip%20art&ved=0CBwQxiAoBGoXChMI8Jj2hbLbhQMVAAAAAB0AAAAAEAc
 # comet hit sound effect: https://www.youtube.com/watch?v=wOh41654QFg
 # asteroid hit sound effect: https://www.youtube.com/watch?v=h3cZFqppGRE
 # bone pickup sound effect: https://www.youtube.com/watch?v=iJe4k2AMOk4
@@ -18,7 +14,7 @@ from pygame.locals import *
 WIDTH = 800
 HEIGHT = 800
 FPS = 60
-LIVES = 900
+LIVES = 5
 timeAlive = 0
 
 # define colors
@@ -103,22 +99,10 @@ class Asteroid(pygame.sprite.Sprite):
         self.speedy = random.randrange(2,4)
         self.speedx = random.randrange(-1,2)
         self.rot = 0
-        self.rotate_speed = random.randrange(-8,8)
+        # self.rotate_speed = random.randrange(-8,8)
         self.last_update = pygame.time.get_ticks()
 
-    def rotate(self):
-        present = pygame.time.get_ticks()
-        if present - self.last_update > 50:
-            self.last_update = present
-            self.rot = (self.rot + self.rotate_speed) % 360
-            new_image = pygame.transform.rotate(self.image_orig, self.rot)
-            old_center = self.rect.center
-            self.image = new_image
-            self.rect = self.image.get_rect()
-            self.rect.center = old_center
-
     def update(self):
-        self.rotate()
         self.rect.x += self.speedx
         self.rect.y += self.speedy
         if self.rect.top > HEIGHT + 100 or self.rect.left < -100 or self.rect.right > WIDTH + 100:
@@ -147,7 +131,6 @@ class Bone(pygame.sprite.Sprite):
 # load all game sounds
 hit_sound = pygame.mixer.Sound('hit.wav')
 clang_sound = pygame.mixer.Sound('softclang.wav')
-# for VERY LOUD CLANGS load 'clang.wav' (funny)
 bone_sound =  pygame.mixer.Sound('bone.wav')
 hit_sound.set_volume(.5)
 clang_sound.set_volume(1)
@@ -185,94 +168,183 @@ for i in range(5):
     asteroids.add(a)
 
 
+# State stuff 
+STATE_START = 0
+STATE_GAME = 1
+STATE_END = 2
+current_state = STATE_START
+
+
 pygame.mixer.music.load('the-moon.wav')
 pygame.mixer.music.set_volume(0.5)
 pygame.mixer.music.play(-1, 0.0)
 musicPlaying = True
 
-font = pygame.font.SysFont(None, 36)
+font1 = pygame.font.SysFont(None, 36)
+font2 = pygame.font.SysFont(None, 18)
 
 # game loop
 running = True
 while running:
     # keep loop running at the right speed
     clock.tick(FPS)
-    timeAlive += 1
-    # Process input (events)
-    for event in pygame.event.get():
-        # check for closing window
-        if event.type == pygame.QUIT:
-            running = False
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                player.powerup()
 
-    if timeAlive % 500 == 0:
-        for i in range(2):  
+    if current_state == STATE_START:
+        # Process input (events)
+        for event in pygame.event.get():
+            # check for closing window
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    current_state = STATE_GAME
+        y1 += 4
+        y2 += 4
+
+        LIVES = 5
+
+        if y1 >= background_height:
+            y1 = -background_height
+        if y2 >= background_height:
+            y2 = -background_height
+
+        screen.blit(background, (0, y1))
+        screen.blit(background, (0, y2))
+
+        start_text1 = font2.render("Welcome to Cosmic Canine! Help the space pup Luna navigate through the treacherous galaxy.", True, WHITE)
+        start_text2 = font2.render("Colliding with asteriods and comets takes away lives while collecting bones gives you lives. Press the SPACE key to start", True, WHITE)
+
+        screen.blit(start_text1, (WIDTH-740, HEIGHT-500))
+        screen.blit(start_text2, (WIDTH-740, HEIGHT-460))
+        pygame.display.update()
+
+
+    elif current_state == STATE_GAME:
+        timeAlive += 1
+
+        # Process input (events)
+        for event in pygame.event.get():
+            # check for closing window
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    player.powerup()
+
+
+        if timeAlive % 500 == 0:
+            for i in range(2):  
+                c = Comet()
+                all_sprites.add(c)
+                comets.add(c)
+
+        # update
+        all_sprites.update()
+
+        asteroid_comet_hits = pygame.sprite.groupcollide(asteroids, comets, False, True, pygame.sprite.collide_circle)
+        for asteroid_comet in asteroid_comet_hits:
             c = Comet()
             all_sprites.add(c)
             comets.add(c)
 
-    # update
-    all_sprites.update()
+        asteroid_hits = pygame.sprite.spritecollide(player, asteroids, True, pygame.sprite.collide_circle)
+        for asteroid in asteroid_hits:
+            clang_sound.play()
+            a = Asteroid()
+            all_sprites.add(a)
+            asteroids.add(a)
 
-    asteroid_comet_hits = pygame.sprite.groupcollide(asteroids, comets, False, True, pygame.sprite.collide_circle)
-    for asteroid_comet in asteroid_comet_hits:
-        c = Comet()
-        all_sprites.add(c)
-        comets.add(c)
-
-    asteroid_hits = pygame.sprite.spritecollide(player, asteroids, True, pygame.sprite.collide_circle)
-    for asteroid in asteroid_hits:
-        clang_sound.play()
-        a = Asteroid()
-        all_sprites.add(a)
-        asteroids.add(a)
-
-    if asteroid_hits:
-        LIVES -= 2
+        if asteroid_hits:
+            LIVES -= 2
 
 
-    bone_hits = pygame.sprite.spritecollide(player, bones, True)
-    for bone in bone_hits:
-        bone_sound.play()
-        b = Bone()
-        all_sprites.add(b)
-        bones.add(b)
-    
-    if bone_hits:
-        LIVES += 2
+        bone_hits = pygame.sprite.spritecollide(player, bones, True)
+        for bone in bone_hits:
+            bone_sound.play()
+            b = Bone()
+            all_sprites.add(b)
+            bones.add(b)
+        
+        if bone_hits:
+            LIVES += 2
 
 
-    # check to see if a comet hit the player
-    comet_hits = pygame.sprite.spritecollide(player, comets, True)
-    for comet in comet_hits:
-        hit_sound.play()
-        c = Comet()
-        all_sprites.add(c)
-        comets.add(c)
+        # check to see if a comet hit the player
+        comet_hits = pygame.sprite.spritecollide(player, comets, True)
+        for comet in comet_hits:
+            hit_sound.play()
+            c = Comet()
+            all_sprites.add(c)
+            comets.add(c)
 
-    if comet_hits:
-        LIVES -= 1
-    if LIVES <= 0:
-        running = False
+        if comet_hits:
+            LIVES -= 1
+        if LIVES <= 0:
+            current_state = STATE_END
 
-    y1 += 4
-    y2 += 4
+        y1 += 4
+        y2 += 4
 
-    if y1 >= background_height:
-        y1 = -background_height
-    if y2 >= background_height:
-        y2 = -background_height
+        if y1 >= background_height:
+            y1 = -background_height
+        if y2 >= background_height:
+            y2 = -background_height
 
-    screen.blit(background, (0, y1))
-    screen.blit(background, (0, y2))
+        screen.blit(background, (0, y1))
+        screen.blit(background, (0, y2))
 
-    all_sprites.draw(screen)
+        all_sprites.draw(screen)
 
-    lives_text = font.render("Lives: " + str(LIVES), True, WHITE)
-    screen.blit(lives_text, (10, 10))
+        lives_text = font1.render("Lives: " + str(LIVES), True, WHITE)
+        screen.blit(lives_text, (10, 10))
 
-    pygame.display.update()
+        pygame.display.update()
+
+    elif current_state == STATE_END:
+        for event in pygame.event.get():
+            # check for closing window
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    current_state = STATE_START
+                    y1 = 0
+                    y2 = background_height
+
+                    all_sprites = pygame.sprite.Group()
+                    comets = pygame.sprite.Group()
+                    bones = pygame.sprite.Group()
+                    asteroids = pygame.sprite.Group()
+                    player = Player()
+                    all_sprites.add(player)
+                    for i in range(12):
+                        c = Comet()
+                        all_sprites.add(c)
+                        comets.add(c)
+                    for i in range(1):
+                        b = Bone()
+                        all_sprites.add(b)
+                        bones.add(b)
+                    for i in range(5):
+                        a = Asteroid()
+                        all_sprites.add(a)
+                        asteroids.add(a)
+        y1 += 4
+        y2 += 4
+
+        if y1 >= background_height:
+            y1 = -background_height
+        if y2 >= background_height:
+            y2 = -background_height
+
+        screen.blit(background, (0, y1))
+        screen.blit(background, (0, y2))
+
+        start_text1 = font2.render("Thanks for playing!", True, WHITE)
+        start_text2 = font2.render("Press the SPACE key to restart", True, WHITE)
+
+        screen.blit(start_text1, (WIDTH-740, HEIGHT-500))
+        screen.blit(start_text2, (WIDTH-740, HEIGHT-460))
+        pygame.display.update()
 
 pygame.quit()
