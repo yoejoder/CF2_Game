@@ -175,7 +175,6 @@ STATE_GAME = 1
 STATE_END = 2
 current_state = STATE_START
 
-
 pygame.mixer.music.load('the-moon.wav')
 pygame.mixer.music.set_volume(0.5)
 pygame.mixer.music.play(-1, 0.0)
@@ -191,7 +190,7 @@ while running:
     clock.tick(FPS)
 
     if current_state == STATE_START:
-        # Process input (events)
+
         for event in pygame.event.get():
             # check for closing window
             if event.type == pygame.QUIT:
@@ -212,12 +211,37 @@ while running:
         screen.blit(background, (0, y1))
         screen.blit(background, (0, y2))
 
-        start_text1 = font2.render("Welcome to Cosmic Canine! Help the space pup Luna navigate through the treacherous galaxy.", True, WHITE)
-        start_text2 = font2.render("Colliding with asteriods and comets takes away lives while collecting bones gives you lives. Press the SPACE key to start", True, WHITE)
+        start_ship = pygame.transform.scale(player_image, (200, 200))
+        start_ship_rect = start_ship.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+        screen.blit(start_ship, (300,600))
 
-        screen.blit(start_text1, (WIDTH-740, HEIGHT-500))
-        screen.blit(start_text2, (WIDTH-740, HEIGHT-460))
+        target_player_size = (30, 55)
+        target_player_pos = (WIDTH // 2, HEIGHT - 10)
+        
+        animation_duration = 1.0  
+        animation_timer = 0.0
+
+        start_text_lines = [
+            "Welcome to Cosmic Canine!",
+            "Help Luna the space pup navigate through the treacherous galaxy!",
+            "Colliding with asteroids and comets takes away lives. Collecting bones gives you lives.",
+            "Beware! the longer you survive, more asteroids and comets will come your way.",
+            "Press the SPACE key to start"
+        ]
+
+        start_font = pygame.font.SysFont(None, 27)
+
+        total_text_height = sum([start_font.size(line)[1] for line in start_text_lines])
+
+        y_start = (HEIGHT - total_text_height) // 2
+
+        for i, line in enumerate(start_text_lines):
+            rendered_text = start_font.render(line, True, WHITE)
+            text_rect = rendered_text.get_rect(center=(WIDTH // 2, y_start + i * 50))  # Adjust the vertical spacing
+            screen.blit(rendered_text, text_rect)
+
         pygame.display.update()
+        
 
 
     elif current_state == STATE_GAME:
@@ -343,9 +367,12 @@ while running:
 
         start_text1 = font2.render("Thanks for playing!", True, WHITE)
         start_text2 = font2.render("Press the SPACE key to restart", True, WHITE)
+        text_rect1 = start_text1.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 50))
+        text_rect2 = start_text2.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+        
+        screen.blit(start_text1, text_rect1)
+        screen.blit(start_text2, text_rect2)
 
-        screen.blit(start_text1, (WIDTH-740, HEIGHT-500))
-        screen.blit(start_text2, (WIDTH-740, HEIGHT-460))
         pygame.display.update()
 
 pygame.quit()
