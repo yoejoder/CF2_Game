@@ -233,7 +233,7 @@ while running:
             "Help Luna the space pup navigate through the treacherous galaxy!",
             "Tilt your physical space ship LEFT and RIGHT to control Luna on screen.",
             "Colliding with asteroids and comets takes away lives. Collecting bones gives you lives.",
-            "Beware! the longer you survive, more asteroids and comets will come your way.",
+            "Beware! the longer you survive, more comets will come your way.",
             "Point the spaceship UP to start"
         ]
         y_start = (HEIGHT - sum([start_font.size(line)[1] for line in start_text_lines])) // 2

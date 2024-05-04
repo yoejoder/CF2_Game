@@ -219,10 +219,9 @@ while running:
         start_text_lines = [
             "Welcome to Cosmic Canine!",
             "Help Luna the space pup navigate through the treacherous galaxy!",
-            "Tilt your physical space ship LEFT and RIGHT to control Luna on screen.",
             "Colliding with asteroids and comets takes away lives. Collecting bones gives you lives.",
-            "Beware! the longer you survive, more asteroids and comets will come your way.",
-            "Point the spaceship UP to start"
+            "Beware! the longer you survive, more comets will come your way.",
+            "Press the SPACE key to start"
         ]
         y_start = (HEIGHT - sum([start_font.size(line)[1] for line in start_text_lines])) // 2
         for i, line in enumerate(start_text_lines):
@@ -384,7 +383,7 @@ while running:
         end_text_lines = [
             "Game Over!",
             f"Final Score: {final_score}",
-            "Point the spaceship UP to restart."
+            "Press SPACE to restart."
         ]
         y_start = (HEIGHT - sum([end_font.size(line)[1] for line in end_text_lines])) // 2
         for i, line in enumerate(end_text_lines):
