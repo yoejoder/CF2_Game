@@ -8,7 +8,7 @@
 # asteroid hit sound effect: https://www.youtube.com/watch?v=h3cZFqppGRE
 # bone pickup sound effect: https://www.youtube.com/watch?v=iJe4k2AMOk4
 
-import pygame, sys, random, math, serial
+import pygame, sys, random, math
 from pygame.locals import *
 
 WIDTH = 800
@@ -33,48 +33,37 @@ pygame.mixer.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Cosmic Canine")
 clock = pygame.time.Clock()
-arduino = serial.Serial('/dev/cu.usbserial-110', 9600)
 
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
-        super().__init__()
-        self.image = pygame.transform.scale(player_image, (50, 75))
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.transform.scale(player_image, (30,55))
         self.image.set_colorkey(WHITE)
         self.rect = self.image.get_rect()
-        self.rect.centerx = WIDTH // 2
+        self.rect.centerx = WIDTH / 2
         self.rect.bottom = HEIGHT - 10
-        self.speedx = 10
-        self.move_left = False
-        self.move_right = False
+        self.speedx = 0
 
     def update(self):
-        while arduino.in_waiting > 0:
-            line = arduino.readline().decode('utf-8').strip()
-            if line == "LEFT":
-                self.move_left = True
-                self.move_right = False
-            elif line == "RIGHT":
-                self.move_left = False
-                self.move_right = True
-            elif line == "Forward":  
-                self.move_left = False
-                self.move_right = False
-        self.rect.x = max(0, min(WIDTH - self.rect.width, self.rect.x))
-        if self.move_left:
-            self.rect.x -= self.speedx
-        if self.move_right:
-            self.rect.x += self.speedx
-
-        if self.move_left:
-            playerImage = pygame.image.load('spaceshipleft.png')
-            self.image = pygame.transform.scale(playerImage, (60, 60))
-        elif self.move_right:
-            playerImage = pygame.image.load('spaceshipright.png')
-            self.image = pygame.transform.scale(playerImage, (60, 60))
+        self.speedx = 0
+        keystate = pygame.key.get_pressed()
+        if keystate[pygame.K_LEFT]:
+            self.speedx = -5
+            player_image = pygame.image.load('spaceshipleft.png')
+            self.image = pygame.transform.scale(player_image, (40, 40))
+        elif keystate[pygame.K_RIGHT]:
+            self.speedx = 5
+            player_image = pygame.image.load('spaceshipright.png')
+            self.image = pygame.transform.scale(player_image, (40, 40))
         else:
-            playerImage = pygame.image.load('spaceship_up.png')
-            self.image = pygame.transform.scale(playerImage, (50, 75))
+            player_image = pygame.image.load('spaceship_up.png')
+            self.image = pygame.transform.scale(player_image, (30, 55))
+        self.rect.x += self.speedx
+        if self.rect.right > WIDTH:
+            self.rect.right = WIDTH
+        if self.rect.left < 0:
+            self.rect.left = 0
 
     # def powerup(self):
         # power = Power(self.rect.centerx, self.rect.top)
@@ -206,14 +195,13 @@ while running:
     score = int(elapsed_time)
     clock.tick(FPS)
     if current_state == STATE_START:
-        while arduino.in_waiting > 0:
-            line = arduino.readline().decode('utf-8').strip()
-            if line == "UP":
-                current_state = STATE_GAME
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    current_state = STATE_GAME
+
 
         y1 += 4
         y2 += 4
@@ -249,9 +237,6 @@ while running:
             # check for closing window
             if event.type == pygame.QUIT:
                 running = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    player.powerup()
 
 
         if LIVES > 0:
@@ -343,43 +328,43 @@ while running:
         pygame.display.update()
 
     elif current_state == STATE_END:
-        while arduino.in_waiting > 0:
-            line = arduino.readline().decode('utf-8').strip()
-            if line == "UP":
-                current_state = STATE_START
-                LIVES = 5
-                timeAlive = 0
-                score = 0
-                final_score = 0
-                start_time = pygame.time.get_ticks()
-                current_ticks = 0
-                freeze_score=False
-                elapsed_time = 0
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    current_state = STATE_START
+                    LIVES = 5
+                    timeAlive = 0
+                    score = 0
+                    final_score = 0
+                    start_time = pygame.time.get_ticks()
+                    current_ticks = 0
+                    freeze_score=False
+                    elapsed_time = 0
 
-                # Reinitialize sprites for a new game
-                all_sprites = pygame.sprite.Group()
-                comets = pygame.sprite.Group()
-                bones = pygame.sprite.Group()
-                asteroids = pygame.sprite.Group()
-                player = Player()
-                all_sprites.add(player)
-                for _ in range(12):
-                    c = Comet()
-                    all_sprites.add(c)
-                    comets.add(c)
-                for _ in range(1):
-                    b = Bone()
-                    all_sprites.add(b)
-                    bones.add(b)
-                for _ in range(5):
-                    a = Asteroid()
-                    all_sprites.add(a)
-                    asteroids.add(a)
+                    # Reinitialize sprites for a new game
+                    all_sprites = pygame.sprite.Group()
+                    comets = pygame.sprite.Group()
+                    bones = pygame.sprite.Group()
+                    asteroids = pygame.sprite.Group()
+                    player = Player()
+                    all_sprites.add(player)
+                    for i in range(12):
+                        c = Comet()
+                        all_sprites.add(c)
+                        comets.add(c)
+                    for i in range(1):
+                        b = Bone()
+                        all_sprites.add(b)
+                        bones.add(b)
+                    for i in range(5):
+                        a = Asteroid()
+                        all_sprites.add(a)
+                        asteroids.add(a)
 
-                y1 = 0
-                y2 = background_height
+                    y1 = 0
+                    y2 = background_height
 
-                pygame.mixer.music.play(-1, 0.0)
+                    pygame.mixer.music.play(-1, 0.0)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
