@@ -211,9 +211,9 @@ while running:
         screen.blit(background, (0, y1))
         screen.blit(background, (0, y2))
 
-        start_ship = pygame.transform.scale(player_image, (200, 200))
+        start_ship = pygame.transform.scale(player_image, (200, 320))
         start_ship_rect = start_ship.get_rect(center=(WIDTH // 2, HEIGHT // 2))
-        screen.blit(start_ship, (300,600))
+        screen.blit(start_ship, (300,450))
 
         target_player_size = (30, 55)
         target_player_pos = (WIDTH // 2, HEIGHT - 10)
@@ -233,7 +233,7 @@ while running:
 
         total_text_height = sum([start_font.size(line)[1] for line in start_text_lines])
 
-        y_start = (HEIGHT - total_text_height) // 2
+        y_start = (HEIGHT - total_text_height - 300) // 2
 
         for i, line in enumerate(start_text_lines):
             rendered_text = start_font.render(line, True, WHITE)
@@ -365,8 +365,10 @@ while running:
         screen.blit(background, (0, y1))
         screen.blit(background, (0, y2))
 
-        start_text1 = font2.render("Thanks for playing!", True, WHITE)
-        start_text2 = font2.render("Press the SPACE key to restart", True, WHITE)
+        end_font = pygame.font.SysFont(None, 30)
+
+        start_text1 = end_font.render("Thanks for playing!", True, WHITE)
+        start_text2 = end_font.render("Press the SPACE key to restart", True, WHITE)
         text_rect1 = start_text1.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 50))
         text_rect2 = start_text2.get_rect(center=(WIDTH // 2, HEIGHT // 2))
         
