@@ -388,7 +388,6 @@ while running:
 
         pygame.display.update()
 
->>>>>>> 7283b637225005d77f3b81f80785dae76ded34dc
 
         pygame.display.update()
 
