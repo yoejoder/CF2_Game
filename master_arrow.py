@@ -370,21 +370,21 @@ while running:
         screen.blit(start_text1, text_rect1)
         screen.blit(start_text2, text_rect2)
 
-        start_text_lines = [
-        "Thanks for playing!",
-        "Press the SPACE key to restart."
-        ]
+        # start_text_lines = [
+        # "Thanks for playing!",
+        # "Press the SPACE key to restart."
+        # ]
 
-        start_font = pygame.font.SysFont(None, 40)
+        # start_font = pygame.font.SysFont(None, 40)
 
-        total_text_height = sum([start_font.size(line)[1] for line in start_text_lines])
+        # total_text_height = sum([start_font.size(line)[1] for line in start_text_lines])
 
-        y_start = (HEIGHT - total_text_height) // 2
+        # y_start = (HEIGHT - total_text_height) // 2
 
-        for i, line in enumerate(start_text_lines):
-            rendered_text = start_font.render(line, True, WHITE)
-            text_rect = rendered_text.get_rect(center=(WIDTH // 2, y_start + i * 50))  # Adjust the vertical spacing
-            screen.blit(rendered_text, text_rect)
+        # for i, line in enumerate(start_text_lines):
+        #     rendered_text = start_font.render(line, True, WHITE)
+        #     text_rect = rendered_text.get_rect(center=(WIDTH // 2, y_start + i * 50))  # Adjust the vertical spacing
+        #     screen.blit(rendered_text, text_rect)
 
         pygame.display.update()
 
