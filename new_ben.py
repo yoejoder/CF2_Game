@@ -19,8 +19,8 @@ WIDTH = 800
 HEIGHT = 800
 FPS = 60
 # <<<<<<< HEAD:Benprogressrestart.py
-# LIVES = 5
-# timeAlive = 0
+LIVES = 5
+timeAlive = 0
 # =======
 # LIVES = 900
 # >>>>>>> 902e1759b76e3dffb52cd478ada00a97f8558f05:new_ben.py
