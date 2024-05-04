@@ -365,9 +365,7 @@ while running:
                     y2 = background_height
 
                     pygame.mixer.music.play(-1, 0.0)
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            elif event.type == pygame.QUIT:
                 running = False
 
         y1 += 4
