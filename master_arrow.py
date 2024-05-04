@@ -215,12 +215,6 @@ while running:
         start_ship_rect = start_ship.get_rect(center=(WIDTH // 2, HEIGHT // 2))
         screen.blit(start_ship, (300,600))
 
-        target_player_size = (30, 55)
-        target_player_pos = (WIDTH // 2, HEIGHT - 10)
-        
-        animation_duration = 1.0  
-        animation_timer = 0.0
-
         start_text_lines = [
             "Welcome to Cosmic Canine!",
             "Help Luna the space pup navigate through the treacherous galaxy!",
@@ -365,13 +359,24 @@ while running:
         screen.blit(background, (0, y1))
         screen.blit(background, (0, y2))
 
-        start_text1 = font2.render("Thanks for playing!", True, WHITE)
-        start_text2 = font2.render("Press the SPACE key to restart", True, WHITE)
-        text_rect1 = start_text1.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 50))
-        text_rect2 = start_text2.get_rect(center=(WIDTH // 2, HEIGHT // 2))
-        
-        screen.blit(start_text1, text_rect1)
-        screen.blit(start_text2, text_rect2)
+        start_text_lines = [
+        "Thanks for playing!",
+        "Press the SPACE key to restart."
+        ]
+
+        start_font = pygame.font.SysFont(None, 40)
+
+        total_text_height = sum([start_font.size(line)[1] for line in start_text_lines])
+
+        y_start = (HEIGHT - total_text_height) // 2
+
+        for i, line in enumerate(start_text_lines):
+            rendered_text = start_font.render(line, True, WHITE)
+            text_rect = rendered_text.get_rect(center=(WIDTH // 2, y_start + i * 50))  # Adjust the vertical spacing
+            screen.blit(rendered_text, text_rect)
+
+        pygame.display.update()
+
 
         pygame.display.update()
 
