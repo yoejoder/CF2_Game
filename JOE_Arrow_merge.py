@@ -341,7 +341,6 @@ while running:
                     freeze_score=False
                     elapsed_time = 0
 
-                    # Reinitialize sprites for a new game
                     all_sprites = pygame.sprite.Group()
                     comets = pygame.sprite.Group()
                     bones = pygame.sprite.Group()
