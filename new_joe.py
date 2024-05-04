@@ -23,7 +23,6 @@ LIVES = 5
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-
 pygame.init()
 pygame.mixer.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -166,6 +165,7 @@ for i in range(6):
 
 pygame.mixer.music.load('the-moon.wav')
 pygame.mixer.music.play(-1)
+
 
 font = pygame.font.SysFont(None, 36)
 
