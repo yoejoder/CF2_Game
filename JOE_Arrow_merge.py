@@ -212,7 +212,7 @@ while running:
 
         screen.blit(background, (0, y1))
         screen.blit(background, (0, y2))
-        start_ship = pygame.transform.scale(player_image, (200, 200))
+        start_ship = pygame.transform.scale(player_image, (200, 320))
         start_ship_rect = start_ship.get_rect(center=(WIDTH // 2, HEIGHT // 2))
         screen.blit(start_ship, (300, 600))
         start_font = pygame.font.SysFont(None, 27)
