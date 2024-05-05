@@ -233,9 +233,9 @@ while running:
 
         screen.blit(background, (0, y1))
         screen.blit(background, (0, y2))
-        start_ship = pygame.transform.scale(player_image, (200, 200))
+        start_ship = pygame.transform.scale(player_image, (200, 320))
         start_ship_rect = start_ship.get_rect(center=(WIDTH // 2, HEIGHT // 2))
-        screen.blit(start_ship, (300, 600))
+        screen.blit(start_ship, (300, 450))
         start_font = pygame.font.SysFont(None, 27)
         start_text_lines = [
             "Welcome to Cosmic Canine!",
@@ -245,7 +245,7 @@ while running:
             "Beware! the longer you survive, more comets will come your way.",
             "Point the spaceship UP to start"
         ]
-        y_start = (HEIGHT - sum([start_font.size(line)[1] for line in start_text_lines])) // 2
+        y_start = (HEIGHT - sum([start_font.size(line)[1] for line in start_text_lines])) -1100 // 2
         for i, line in enumerate(start_text_lines):
             rendered_text = start_font.render(line, True, WHITE)
             text_rect = rendered_text.get_rect(center=(WIDTH // 2, y_start + i * 50))
