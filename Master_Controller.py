@@ -174,7 +174,7 @@ bones = pygame.sprite.Group()
 asteroids = pygame.sprite.Group()
 player = Player()
 all_sprites.add(player)
-for i in range(5):
+for i in range(8):
     c = Comet()
     all_sprites.add(c)
     comets.add(c)
@@ -271,7 +271,7 @@ while running:
             final_score = int((current_ticks - start_time) / 10)  # Score is time in seconds
 
 
-      
+        # Progressivly harder as you survive     
         if timeAlive % 500 == 0:
             for i in range(1):  
                 c = Comet()
