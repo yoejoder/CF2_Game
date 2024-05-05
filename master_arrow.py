@@ -163,7 +163,7 @@ bones = pygame.sprite.Group()
 asteroids = pygame.sprite.Group()
 player = Player()
 all_sprites.add(player)
-for i in range(5):
+for i in range(8):
     c = Comet()
     all_sprites.add(c)
     comets.add(c)

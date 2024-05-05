@@ -106,19 +106,19 @@ class Asteroid(pygame.sprite.Sprite):
         self.rotate_speed = random.randrange(-8,8)
         self.last_update = pygame.time.get_ticks()
 
-    def rotate(self):
-        present = pygame.time.get_ticks()
-        if present - self.last_update > 50:
-            self.last_update = present
-            self.rot = (self.rot + self.rotate_speed) % 360
-            new_image = pygame.transform.rotate(self.image_orig, self.rot)
-            old_center = self.rect.center
-            self.image = new_image
-            self.rect = self.image.get_rect()
-            self.rect.center = old_center
+    # def rotate(self):
+        # present = pygame.time.get_ticks()
+         #if present - self.last_update > 50:
+            # self.last_update = present
+            # self.rot = (self.rot + self.rotate_speed) % 360
+            # new_image = pygame.transform.rotate(self.image_orig, self.rot)
+            # old_center = self.rect.center
+            # self.image = new_image
+            # self.rect = self.image.get_rect()
+            # self.rect.center = old_center
 
     def update(self):
-        self.rotate()
+        # self.rotate()
         self.rect.x += self.speedx
         self.rect.y += self.speedy
         if self.rect.top > HEIGHT + 100 or self.rect.left < -100 or self.rect.right > WIDTH + 100:
@@ -146,7 +146,7 @@ class Bone(pygame.sprite.Sprite):
 
 # load all game sounds
 hit_sound = pygame.mixer.Sound('hit.wav')
-clang_sound = pygame.mixer.Sound('softclang.wav')
+clang_sound = pygame.mixer.Sound('clang.wav')
 # for VERY LOUD CLANGS load 'clang.wav' (funny)
 bone_sound =  pygame.mixer.Sound('bone.wav')
 hit_sound.set_volume(.5)
@@ -179,7 +179,7 @@ for i in range(1):
     b = Bone()
     all_sprites.add(b)
     bones.add(b)
-for i in range(5):
+for i in range(60):
     a = Asteroid()
     all_sprites.add(a)
     asteroids.add(a)
