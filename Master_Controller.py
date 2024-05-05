@@ -11,8 +11,9 @@
 # comet hit sound effect: https://www.youtube.com/watch?v=wOh41654QFg
 # asteroid hit sound effect: https://www.youtube.com/watch?v=h3cZFqppGRE
 # bone pickup sound effect: https://www.youtube.com/watch?v=iJe4k2AMOk4
+# Shelve + highscore help: https://stackoverflow.com/questions/16726354/saving-the-highscore-for-a-game
 
-import pygame, sys, random, math, serial
+import pygame, sys, random, math, serial, shelve
 from pygame.locals import *
 
 WIDTH = 800
@@ -38,6 +39,10 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Cosmic Canine")
 clock = pygame.time.Clock()
 arduino = serial.Serial('/dev/cu.usbserial-110', 9600)
+
+#highscore stuff
+with shelve.open('game_data') as db:
+    highscore = int(db.get('highscore', 0))
 
 
 class Player(pygame.sprite.Sprite):
@@ -347,6 +352,10 @@ while running:
         pygame.display.update()
 
     elif current_state == STATE_END:
+        with shelve.open('game_data', writeback=True) as db:
+            if final_score > db.get('highscore', 0):
+                db['highscore'] = final_score
+                highscore = final_score
         while arduino.in_waiting > 0:
             line = arduino.readline().decode('utf-8').strip()
             if line == "UP":
@@ -403,6 +412,7 @@ while running:
         end_text_lines = [
             "Game Over!",
             f"Final Score: {final_score}",
+            f"High Score: {highscore}",
             "Point the spaceship UP to restart."
         ]
         y_start = (HEIGHT - sum([end_font.size(line)[1] for line in end_text_lines])) // 2

@@ -11,8 +11,8 @@
 # comet hit sound effect: https://www.youtube.com/watch?v=wOh41654QFg
 # asteroid hit sound effect: https://www.youtube.com/watch?v=h3cZFqppGRE
 # bone pickup sound effect: https://www.youtube.com/watch?v=iJe4k2AMOk4
-
-import pygame, sys, random, math
+# Shelve + highscore help: https://stackoverflow.com/questions/16726354/saving-the-highscore-for-a-game
+import pygame, sys, random, math, shelve
 from pygame.locals import *
 
 WIDTH = 800
@@ -37,6 +37,11 @@ pygame.mixer.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Cosmic Canine")
 clock = pygame.time.Clock()
+
+#highscore stuff
+with shelve.open('game_data') as db:
+    highscore = int(db.get('highscore', 0))
+
 
 
 class Player(pygame.sprite.Sprite):
@@ -332,6 +337,10 @@ while running:
         pygame.display.update()
 
     elif current_state == STATE_END:
+        with shelve.open('game_data', writeback=True) as db:
+            if final_score > db.get('highscore', 0):
+                db['highscore'] = final_score
+                highscore = final_score
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
@@ -386,6 +395,7 @@ while running:
         end_text_lines = [
             "Game Over!",
             f"Final Score: {final_score}",
+            f"High Score: {highscore}",
             "Press SPACE to restart."
         ]
         y_start = (HEIGHT - sum([end_font.size(line)[1] for line in end_text_lines])) // 2
